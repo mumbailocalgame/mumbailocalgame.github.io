@@ -2803,6 +2803,10 @@ if (SHOT) { // deterministic states for store screenshots
   const sl = new URLSearchParams(location.search).get('lang'); if (LANGS.includes(sl)) { LANG = sl; applyI18n(); }
   if (SHOT === 'daily') { S.autopilot = true; startGame('daily'); }
   if (SHOT === 'clutch') { S.autopilot = true; S.clutchDemo = true; startGame(); S.dist = 120; }
+  if (SHOT === 'chal' || SHOT === 'chalhome') { // demo challenge from 'Sijo' for trailer/screenshots
+    S.challenge = { v: 1, s: 777, l: 'central', d: 640, c: 'desai', n: 'Sijo', trace: Array.from({ length: 200 }, (_, i) => Math.round(18 * Math.sin(i / 5))) };
+    if (SHOT === 'chal') { S.autopilot = true; startGame('challenge'); } else refreshMenus();
+  }
   if (SHOT === 'replay') { S.autopilot = true; S.clutchDemo = true; startGame(); S.dist = 120; setTimeout(() => { S.clutchDemo = false; S.autopilot = false; }, 9000); }
   if (SHOT === 'seat') { S.autopilot = true; startGame(); S.dist = 120; setTimeout(() => takeItem('seat'), 1200); }
   if (SHOT === 'settings') { renderSettings(); openPanel('settings'); }
