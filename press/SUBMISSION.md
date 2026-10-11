@@ -11,8 +11,9 @@
 | Documentation (PDF) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
 | Video (trailer, 45 s) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-trailer.mp4 |
 | Press kit (all of the above on one page) | https://mumbailocalgame.github.io/press/ |
+| Everything in one ZIP | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-submission.zip |
 
-All links were checked again after the v1.3 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
+All links were checked again after the final v1.3.1 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
 
 ### Optional mirrors (if the judges prefer Google Drive / YouTube)
 The rules list Google Docs/Slides/Drive for documents and YouTube/Drive for videos as examples ("you may use…"). The links above already meet the requirement. To add mirrors:
