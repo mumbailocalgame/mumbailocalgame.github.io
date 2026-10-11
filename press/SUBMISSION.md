@@ -9,7 +9,7 @@
 | Project title | **Mumbai Local Straphanger** |
 | Playable game | https://mumbailocalgame.github.io/ |
 | Documentation (PDF) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
-| Video (trailer, 48 s) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-trailer.mp4 |
+| Video (trailer, 45 s) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-trailer.mp4 |
 | Press kit (all of the above on one page) | https://mumbailocalgame.github.io/press/ |
 
 All links were checked again after the v1.3 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
@@ -34,7 +34,7 @@ On a computer: the ← → arrow keys (or A/D).
 
 ## Files in this folder
 - `mumbai-local-straphanger-design-doc.pdf`: 15-page game design document (v1.3) (source: `doc/design-doc.html`)
-- `mumbai-local-straphanger-trailer.mp4`: 48 s vertical trailer with soundtrack (built by `../tools/make_trailer.py`)
+- `mumbai-local-straphanger-trailer.mp4`: 45 s vertical trailer with soundtrack (built by `../tools/make_trailer.py`)
 - `press/`: the press-kit page published at /press/
 
 ---
