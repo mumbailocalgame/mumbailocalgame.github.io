@@ -860,7 +860,7 @@ function startGame(mode){
   S.runId = Date.now();
   refillMissions(); persist();
   if (!save.tutorialDone && !SHOT) { S.pendingMode = mode; startTutorial(); return; }
-  S.state = 'playing';
+  S.state = 'playing'; $('pauseBtn').style.visibility = '';
   $('hud').classList.remove('hidden'); $('skipTut').classList.add('hidden');
   hudCache = {};
   S.boardT = 2.2; S.boardName = stationName(0);
@@ -1014,6 +1014,7 @@ function gameOver(){
   const rs = T('reasons'); S.reason = rs[Math.random() * rs.length | 0].replace('{0}', stationName(S.level));
   sfxCrash(); vib([60, 40, 160]); S.shake = 0.9; S.flash = 0.6;
   clearInput(); S.event = null; S.evForce = 0;
+  popups.length = 0; $('pauseBtn').style.visibility = 'hidden'; // nothing to pause while falling
   popup(T('arre'), '#ff4d6d', 38, H * 0.5);
   spawn(clamp(S.shX, 20, W - 20), clamp(S.shY, 60, H - 60), 26, { spread: Math.PI, v0: 80, v1: 320, g: 300, colors: ['#ffd23f', '#ffffff', '#ff4d6d'], kind: 'star' });
 }
@@ -1061,7 +1062,7 @@ function continueRun(viaAd){
   S.continued = true; S.state = 'playing';
   S.tilt = 0; S.tiltVel = 0; S.grip = 100; S.exhausted = false; S.grace = 2.5; S.push = S.pushTarget = 0; S.curve = S.curveTarget = 0;
   S.speed = Math.min(12 + (S.level + lvlOff()) * 1.8, 32);
-  $('over').classList.add('hidden'); $('hud').classList.remove('hidden'); hudCache = {};
+  $('over').classList.add('hidden'); $('hud').classList.remove('hidden'); $('pauseBtn').style.visibility = ''; hudCache = {};
   popup(T('grabbed'), '#9cff6b', 34, H * 0.5); sfxHorn(); clearInput();
   if (viaAd) { S.prevState = 'playing'; S.state = 'paused'; $('pause').classList.remove('hidden'); } // let the player get ready after the ad
 }
