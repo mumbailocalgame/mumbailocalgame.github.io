@@ -1731,6 +1731,7 @@ function drawStrap(x, angle, L, scale){
   ctx.restore();
 }
 function drawBgStraps(){
+  if (sprReady && sprOk('oldman-calm')) { for (const x of [0.34, 0.63]) drawStrap(x * W, bgStraps[0].a, G.bgL, 0.85); return; } // illustrated commuters bring their own straps
   for (const b of bgStraps) {
     const x = b.x * W;
     drawStrap(x, b.a, G.bgL, 0.85);
@@ -2248,6 +2249,139 @@ function drawReplayHud(){
   ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(7 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText('×0.5', W - 14, H - bar / 2);
 }
 
+/* ---------- Illustrated characters (Figma AI pose sheets → www/art/*.webp + sprites.json) ----------
+   Each character is a set of full-body poses. The game picks the pose from the mood, tilts the whole
+   figure around the feet for the lean, and draws the strap live from the rail to the ring in the hand. */
+const SPR = {};
+let sprReady = false;
+fetch('art/sprites.json').then(r => r.json()).then(m => {
+  let left = Object.keys(m).length;
+  for (const [k, v] of Object.entries(m)) {
+    const im = new Image(); im.onload = im.onerror = () => { if (--left === 0) { sprReady = true; for (const c in portraitCache) delete portraitCache[c]; if (S.state === 'menu') refreshMenus(); } };
+    im.src = 'art/' + k + '.webp'; SPR[k] = Object.assign({ img: im }, v);
+  }
+}).catch(() => {});
+const sprOk = k => !!(SPR[k] && artOk(SPR[k].img));
+// eye-line centre (x, y as fractions of the calm sprite) and face half-width (fraction of width), measured from the art
+const HEAD = { rahul: { x: 0.41, y: 0.31, r: 0.28, top: 0.2 }, desai: { x: 0.55, y: 0.31, r: 0.23, top: 0.24 }, sunita: { x: 0.42, y: 0.31, r: 0.19, top: 0.235 }, ganesh: { x: 0.48, y: 0.32, r: 0.285, top: 0.2 } };
+const ACC_IMG = {};
+for (const k of ['idcard', 'shades', 'cap', 'phones', 'gajra', 'goldshades', 'pheta']) { const im = new Image(); im.src = 'art/item-' + k + '.webp'; ACC_IMG[k] = im; }
+// one shared scale per character, from its calm pose: feet on the floor, ring just below the rail
+function charScale(key){
+  const c = SPR['p-' + key + '-calm'];
+  return (G.floorY - (G.railY + G.L * 0.32)) / (c.foot[1] - c.top[1]);
+}
+function poseKey(key, mood, seated){
+  const p = seated ? 'sit' : mood === 'ko' ? 'panic' : (mood === 'calm' || mood === 'worry' || mood === 'panic' || mood === 'relief') ? mood : 'calm';
+  return 'p-' + key + '-' + p;
+}
+function drawAccOnSprite(key, acc, sp, sc){ // in sprite-local space (origin at the feet), before rotation is applied by the caller
+  const hd = HEAD[key], im = ACC_IMG[acc]; if (!hd || !im || !artOk(im)) return;
+  const c = SPR['p-' + key + '-calm'], rw = hd.r * c.w * sc;
+  const ex = (hd.x * c.w - c.foot[0]) * sc, ey = (hd.y * c.h - c.foot[1]) * sc, topY = (hd.top * c.h - c.foot[1]) * sc;
+  const ar = im.naturalHeight / im.naturalWidth; let w, x, y;
+  if (acc === 'shades' || acc === 'goldshades') { w = rw * 2.05; x = ex - w / 2; y = ey - w * ar * 0.5; }
+  else if (acc === 'cap') { w = rw * 2.5; x = ex - w * 0.45; y = topY - w * ar * 0.42; }
+  else if (acc === 'phones') { w = rw * 2.5; x = ex - w / 2; y = topY - rw * 0.15; }
+  else if (acc === 'pheta') { w = rw * 2.35; x = ex - w / 2; y = topY - w * ar * 0.55; }
+  else if (acc === 'gajra') { w = rw * 1.1; x = ex + rw * 0.55; y = ey - rw * 0.2; }
+  else if (acc === 'idcard') { w = rw * 0.9; x = ex - w / 2; y = ey + rw * 1.25; }
+  ctx.drawImage(im, x, y, w, w * ar);
+}
+function liveStrap(px, py, rx, ry){ // leather strap from the rail clamp down to the top of the ring
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = INK; ctx.lineWidth = 8 * G.u + 4; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(rx, ry); ctx.stroke();
+  ctx.strokeStyle = '#6b4226'; ctx.lineWidth = 8 * G.u + 1; ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px - 2, py); ctx.lineTo(rx - 2, ry); ctx.stroke();
+  ctx.fillStyle = '#9aa1a8'; rr(ctx, px - 9 * G.u, py - 6 * G.u, 18 * G.u, 11 * G.u, 3); ctx.fill(); ink(0.7);
+}
+function drawPlayerSprite(){
+  const key = heroKey(); if (!sprReady || !sprOk('p-' + key + '-calm')) return false;
+  const mood = moodOf(), seated = S.seatT > 0, pk = poseKey(key, mood, seated && S.seatT > 0.35 && S.seatT < 5.65);
+  const sp = SPR[pk] || SPR['p-' + key + '-calm'], c = SPR['p-' + key + '-calm'], sc = charScale(key);
+  const th = seated ? 0 : S.tilt * DEG, fx = G.cx, fy = G.floorY;
+  const pivotX = fx + (c.top[0] - c.foot[0]) * sc; G.px = pivotX;
+  // hatched floor shadow
+  ctx.save(); ctx.beginPath(); ctx.ellipse(fx + Math.sin(th) * 20, fy + 4, G.tw * 0.85, G.tw * 0.15, 0, 0, TAU); ctx.clip(); hatchRect(fx - G.tw * 1.3, fy - G.tw, G.tw * 2.8, G.tw * 2, 0.7); ctx.restore();
+  const isSit = pk.endsWith('-sit');
+  if (isSit) { // the seat you won: a brown bench under the hips
+    const bh = sp.h * sc * 0.4; ctx.beginPath(); rr(ctx, fx - G.tw, fy - bh, G.tw * 2, G.tw * 0.26, 6); fillInk('#8a5a33', 1);
+    ctx.beginPath(); rr(ctx, fx - G.tw * 0.9, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
+    ctx.beginPath(); rr(ctx, fx + G.tw * 0.76, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
+    drawStrap(pivotX, S.strapA, G.L * 1.1, 1); // the empty strap swings above
+  }
+  const lx = (sp.top[0] - sp.foot[0]) * sc, ly = (sp.top[1] - sp.foot[1]) * sc; // ring top in local space
+  const cth = Math.cos(th), sth = Math.sin(th);
+  const ringX = fx + lx * cth - ly * sth, ringY = fy + lx * sth + ly * cth;
+  if (!isSit && mood !== 'ko') liveStrap(pivotX, G.railY, ringX, ringY + 2);
+  if (mood === 'ko') drawStrap(pivotX, S.strapA, G.L, 1); // let go: the strap swings free
+  const jit = mood === 'panic' ? (Math.random() - 0.5) * 1.6 : 0, bob = mood === 'relief' ? -Math.abs(Math.sin(S.t * 10)) * 3 : 0;
+  ctx.save(); ctx.translate(fx + jit, fy + bob); ctx.rotate(th);
+  ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
+  const acc = save.acc; if (acc && !isSit) drawAccOnSprite(key, acc, sp, sc);
+  ctx.restore();
+  // head + shoulder positions (speech bubbles, fall particles)
+  const hd = HEAD[key] || { x: 0.45, y: 0.3 }, hx = (hd.x * c.w - c.foot[0]) * sc, hy = (hd.top * c.h - c.foot[1]) * sc;
+  S.headX = fx + hx * cth - hy * sth; S.headY = fy + hx * sth + hy * cth;
+  const sy0 = -c.h * sc * 0.6; S.shX = fx - sy0 * sth; S.shY = fy + sy0 * cth;
+  return true;
+}
+const NEIGH = ['oldman', 'saree', 'specs', 'mustard'];
+function drawCommuterSprites(){
+  if (!sprReady || !sprOk('oldman-calm')) return false;
+  const sleeper = S.event === 'sleepy' ? (S.evSide > 0 ? 1 : 2) : -1, sk = evK();
+  COMMUTERS.forEach((cm, idx) => {
+    const set = NEIGH[idx], glaring = S.glare && S.glare.idx === idx, cheering = S.cheerT > 0;
+    const sp = SPR[set + '-' + (cheering ? 'cheer' : glaring ? 'glare' : 'calm')] || SPR[set + '-calm'], c = SPR[set + '-calm'];
+    const flip = idx >= 2 ? -1 : 1, depth = 0.9;
+    const sc = (G.floorY - (G.railY + G.L * 0.32)) / (c.foot[1] - c.top[1]) * depth;
+    let ang = clamp(S.force * 0.0018, -0.25, 0.25) + Math.sin(S.t * 1.7 + cm.ph) * 0.025;
+    if (idx === sleeper) ang += S.evSide * 0.16 * sk;
+    if (glaring) ang += (idx >= 2 ? 0.05 : -0.05);
+    const bx = cm.x * W, by = G.floorY - H * 0.012;
+    ctx.save(); ctx.beginPath(); ctx.ellipse(bx, by + 3, G.tw * 0.55, G.tw * 0.11, 0, 0, TAU); ctx.clip(); hatchRect(bx - G.tw, by - G.tw, G.tw * 2, G.tw * 2, 0.55); ctx.restore();
+    const lx = (sp.top[0] - sp.foot[0]) * sc * flip, ly = (sp.top[1] - sp.foot[1]) * sc;
+    const ca = Math.cos(ang), sa = Math.sin(ang);
+    const rx = bx + lx * ca - ly * sa, ry = by + lx * sa + ly * ca;
+    const pivot = bx + (c.top[0] - c.foot[0]) * sc * flip;
+    liveStrap(pivot, G.railY, rx, ry + 2);
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(ang); ctx.scale(flip, 1);
+    ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
+    ctx.restore();
+    const hx = (sp.w * 0.45 - sp.foot[0]) * sc * flip, hy = (sp.h * 0.22 - sp.foot[1]) * sc;
+    cm.hx = bx + hx * ca - hy * sa; cm.hy = by + hx * sa + hy * ca;
+    if (idx === sleeper) { ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.font = `700 ${Math.round(14 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'center'; const zy = cm.hy - G.headR * 1.4 - Math.sin(S.t * 3) * 4; ctx.strokeText('Zzz', cm.hx, zy); ctx.fillText('Zzz', cm.hx, zy); }
+  });
+  return true;
+}
+function drawChaiwalaSprite(){
+  if (S.event !== 'chai') return true;
+  if (!sprReady || !sprOk('chai-walk1')) return false;
+  const p = S.eventT / S.eventDur, x = S.evSide > 0 ? lerp(-W * 0.25, W * 1.25, p) : lerp(W * 1.25, -W * 0.25, p);
+  const frames = ['chai-walk1', 'chai-walk2', 'chai-walk3', 'chai-walk2'], sp = SPR[frames[Math.floor(S.t * 7) % 4]];
+  const sc = (G.floorY - G.winY1 * 0.95) / sp.h, by = G.floorY - H * 0.005, flip = S.evSide > 0 ? 1 : -1;
+  ctx.save(); ctx.translate(x, by - Math.abs(Math.sin(S.t * 14)) * 2); ctx.scale(flip, 1);
+  ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
+  ctx.restore();
+  const byy = by - sp.h * sc - 18; ctx.font = `700 ${Math.round(9 * G.u + 6)}px ${FONT}`; const tw2 = ctx.measureText(T('chaiCall')).width + 22;
+  ctx.beginPath(); rr(ctx, x - tw2 / 2, byy - 14, tw2, 28, 14); fillInk('#fff', 0.8);
+  ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(T('chaiCall'), x, byy + 1);
+  return true;
+}
+// shop "wearer" badge / portraits: the calm illustrated pose with the accessory on, cropped to head and shoulders
+function spritePortrait(key, acc){
+  const c = SPR['p-' + key + '-calm']; if (!c || !artOk(c.img)) return null;
+  const out = document.createElement('canvas'); out.width = out.height = 300; const oc = out.getContext('2d');
+  const sc = 300 / (c.w * 1.05), keep = ctx;
+  try {
+    ctx = oc; ctx.save(); ctx.translate(150 - (c.w * 0.5 - c.foot[0]) * sc, c.foot[1] * sc - (HEAD[key] ? HEAD[key].top * c.h * sc - 20 : 0));
+    ctx.drawImage(c.img, -c.foot[0] * sc, -c.foot[1] * sc, c.w * sc, c.h * sc);
+    if (acc) drawAccOnSprite(key, acc, c, sc);
+    ctx.restore();
+  } finally { ctx = keep; }
+  return out.toDataURL('image/png');
+}
+
 function drawFx(){
   const hq = save.settings.hq;
   const nd = hq ? dust.length : 10;
@@ -2413,7 +2547,7 @@ function render(){
   const z = 1 + 0.04 * S.danger; // push in on the player at the edge
   ctx.save();
   ctx.translate(W / 2 + ox, H * 0.55 + oy); ctx.rotate(roll); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.55);
-  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); drawCommuters(); drawChaiwala(); drawGhost(); drawPlayer(); drawForeground(); drawBubbles();
+  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); if (!drawCommuterSprites()) drawCommuters(); if (!drawChaiwalaSprite()) drawChaiwala(); drawGhost(); if (!drawPlayerSprite()) drawPlayer(); drawForeground(); drawBubbles();
   if (S.event === 'tunnel') { ctx.fillStyle = `rgba(10,5,25,${0.4 * evK()})`; ctx.fillRect(-80, -80, W + 160, H + 160); }
   ctx.restore();
   drawFx(); drawOffer(); drawBuffs(); drawBoard(); drawBanner(); drawTutorial(); if (S.state !== 'replay') { drawGauge(); drawTouchHints(); } drawReplayHud();
@@ -2520,6 +2654,7 @@ function portrait(key, acc){
   acc = acc || '';
   const id = key + '|' + acc + '|' + Math.round(W) + 'x' + Math.round(H);
   if (portraitCache[id]) return portraitCache[id];
+  if (sprReady) { const spp = spritePortrait(key, acc); if (spp) return (portraitCache[id] = spp); }
   const sc = 2, off = document.createElement('canvas'); off.width = Math.ceil(W * sc); off.height = Math.ceil(H * sc);
   const oc = off.getContext('2d'); oc.setTransform(sc, 0, 0, sc, 0, 0);
   const keep = { ctx, tilt: S.tilt, strapA: S.strapA, state: S.state, seatT: S.seatT, reliefT: S.reliefT, exhausted: S.exhausted, t: S.t, headX: S.headX, headY: S.headY };
