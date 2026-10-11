@@ -2259,7 +2259,10 @@ fetch('art/sprites.json').then(r => r.json()).then(m => {
   const ents = Object.entries(m).filter(([k]) => k[0] !== '_'); // '_' keys are build metadata, not images
   let left = ents.length;
   for (const [k, v] of ents) {
-    const im = new Image(); im.onload = im.onerror = () => { if (--left === 0) { sprReady = true; for (const c in portraitCache) delete portraitCache[c]; if (S.state === 'menu') refreshMenus(); } };
+    const im = new Image(), done = () => { if (--left === 0) { sprReady = true; window.__artReady = true; window.__artMissing = Object.keys(SPR).filter(k => !sprOk(k)).length; // read by the screenshot/recording tools
+      for (const c in portraitCache) delete portraitCache[c]; if (S.state === 'menu') refreshMenus(); } };
+    im.onload = done;
+    im.onerror = () => { if (im.dataset.retry) return done(); im.dataset.retry = 1; setTimeout(() => { im.src = 'art/' + k + '.webp?r=' + Date.now(); }, 400); }; // one retry on a flaky network
     im.src = 'art/' + k + '.webp'; SPR[k] = Object.assign({ img: im }, v);
   }
 }).catch(() => {});
@@ -3033,7 +3036,7 @@ if (window.ResizeObserver) new ResizeObserver(layout).observe(game);
 })();
 S.challenge = readChallenge();
 layout(); applyI18n(); tickLed();
-if (SHOT) { // deterministic states for store screenshots
+function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
   save.tutorialDone = true;
   const sc = new URLSearchParams(location.search).get('c'); if (CHARS[sc]) { save.char = sc; save.owned = CHAR_ORDER.slice(); }
   const sl = new URLSearchParams(location.search).get('lang'); if (LANGS.includes(sl)) { LANG = sl; applyI18n(); }
@@ -3053,6 +3056,7 @@ if (SHOT) { // deterministic states for store screenshots
   if (SHOT === 'tut') { save.tutorialDone = false; hideOverlays(); startTutorial(); }
   if (SHOT === 'event' || SHOT === 'chai') { S.dist = 60; setTimeout(() => startEvent(1, SHOT === 'chai' ? 'chai' : 'monsoon'), 300); }
 }
+if (SHOT) { const t0 = Date.now(); (function wait(){ if (sprReady || Date.now() - t0 > 8000) runShot(); else setTimeout(wait, 50); })(); }
 requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
 })();
 </script>
