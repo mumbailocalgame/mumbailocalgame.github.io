@@ -270,6 +270,12 @@ button:active,.album:active,.row:active{transform:scale(.96)}
 .scard .nm{font-size:14px;font-weight:600}
 .scard .cta{margin:0;padding:8px;font-size:13px}
 .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+img.charart{object-fit:contain!important;object-position:50% 100%;padding-top:6%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.cover img.charart{padding-top:10%}
+.scard .art{background:radial-gradient(circle at 50% 40%,#3a3a44,#24242a)!important}
+.scard .art img.itemart{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:16% 16% 22%;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
+.scard .art img.wearer{position:absolute;right:6px;bottom:6px;width:36%;height:36%;object-fit:cover;border-radius:50%;border:2px solid var(--accent);background:var(--surface3)}
+.hero{background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.25) 40%,rgba(8,8,10,.92) 100%),url(art/hero.webp) center 30%/cover!important;min-height:220px}
 /* --- game over extras --- */
 .secondary.hl{background:#3a2a05;color:var(--accent)}
 .primary.blue{background:var(--blue);color:#fff;margin-top:8px}
@@ -337,6 +343,7 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
     </div>
     <nav class="tabbar">
       <button class="tab on" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round"><path d="M3.5 10.5L12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5z"/></svg><span data-i18n="home">Home</span></button>
+      <button class="tab" id="shopBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span data-i18n="shop">Shop</span></button>
       <button class="tab" id="recordsBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 4v12"/><circle cx="17" cy="17.5" r="2.5"/></svg><span data-i18n="records">Records</span></button>
       <button class="tab" id="settingsBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="settings">Settings</span></button>
     </nav>
@@ -346,7 +353,7 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
   <div id="chars" class="overlay sheet-wrap hidden">
     <div class="sheet shop">
       <div class="grabber"></div>
-      <div class="sheet-head"><h2 data-i18n="chooseCommuter">Choose your commuter</h2><button class="done" id="charsClose" data-i18n="done">Done</button></div>
+      <div class="sheet-head"><h2 data-i18n="shop">Shop</h2><button class="done" id="charsClose" data-i18n="done">Done</button></div>
       <p class="sheet-sub"><i class="coin"></i><span id="coinsChars" class="num">0</span></p>
       <div class="seg" id="shopTabs"><button data-tab="c" class="on" data-i18n="commuters">Commuters</button><button data-tab="s" data-i18n="tabStyle">Style</button></div>
       <div class="carousel" id="cgrid"></div>
@@ -665,10 +672,10 @@ const S = {
 };
 const bgStraps = [0.1, 0.29, 0.71, 0.9].map((x, i) => ({ x, a: 0, v: 0, ph: i * 1.7, rx: 0, ry: 0 }));
 const COMMUTERS = [
-  { x: 0.07, s: 0.9,  shirt: '#2f7f7a', skin: '#9c6644', hair: '#161616', type: 'cap',   hold: 0, ph: 0.3 },
-  { x: 0.27, s: 0.86, shirt: '#7d3c8a', skin: '#8d5524', hair: '#1e1a1a', type: 'saree', hold: 1, ph: 1.7, drape: '#e9b949' },
-  { x: 0.72, s: 0.88, shirt: '#7d8b45', skin: '#c08552', hair: '#121212', type: 'specs', hold: 2, ph: 2.4 },
-  { x: 0.93, s: 0.92, shirt: '#c2852f', skin: '#a0673f', hair: '#1a1a1a', type: 'short', hold: 3, ph: 4.1 }
+  { x: 0.02, s: 0.9,  shirt: '#2f7f7a', skin: '#9c6644', hair: '#161616', type: 'cap',   hold: 0, ph: 0.3 },
+  { x: 0.19, s: 0.86, shirt: '#7d3c8a', skin: '#8d5524', hair: '#1e1a1a', type: 'saree', hold: 1, ph: 1.7, drape: '#e9b949' },
+  { x: 0.81, s: 0.88, shirt: '#7d8b45', skin: '#c08552', hair: '#121212', type: 'specs', hold: 2, ph: 2.4 },
+  { x: 0.99, s: 0.92, shirt: '#c2852f', skin: '#a0673f', hair: '#1a1a1a', type: 'short', hold: 3, ph: 4.1 }
 ];
 const particles = [], popups = [], dust = [];
 for (let i = 0; i < 30; i++) dust.push({ x: Math.random(), y: Math.random(), r: rand(0.6, 1.9), vx: rand(-0.01, 0.01), vy: rand(-0.014, -0.003), ph: Math.random() * TAU });
@@ -1653,6 +1660,9 @@ function drawWindows(){
   ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, TAU); ctx.fill();
   ctx.strokeStyle = '#d62828'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(sx, sy, sr - 1, 0, TAU); ctx.moveTo(sx - sr * 0.7, sy - sr * 0.7); ctx.lineTo(sx + sr * 0.7, sy + sr * 0.7); ctx.stroke();
   ctx.fillStyle = '#333'; ctx.fillRect(sx - sr * 0.55, sy - 1.5, sr * 1.1, 3);
+  const pst = ART['poster-chai'];
+  if (artOk(pst)) { const pw2 = pw * 0.86, ph2 = pw2 * pst.naturalHeight / pst.naturalWidth; ctx.drawImage(pst, sx - pw2 / 2, y0 + h * 0.5, pw2, ph2); }
+
 }
 function drawInterior(){
   const m = 70;
@@ -1664,7 +1674,14 @@ function drawInterior(){
   if (!flicker) { ctx.fillStyle = gr.light; ctx.fillRect(0, 0, W, G.winY1); }
   ctx.fillStyle = flicker ? '#bdbcb2' : '#fffef4'; rr(ctx, W * 0.36, G.ceilH * 0.55, W * 0.28, 7 * G.u + 3, 4); ctx.fill();
   const fr = Math.min(H * 0.04, W * 0.08);
-  for (const fx of [W * 0.15, W * 0.85]) {
+  if (artOk(ART.fan)) for (const fx of [W * 0.15, W * 0.85]) {
+    const fw = fr * 2.6, fh = fw * ART.fan.naturalHeight / ART.fan.naturalWidth, fy = G.ceilH * 0.6;
+    ctx.drawImage(ART.fan, fx - fw / 2, fy - fh / 2, fw, fh);
+    ctx.save(); ctx.translate(fx, fy + fh * 0.05); ctx.scale(1, 0.45); ctx.fillStyle = 'rgba(60,60,70,.18)';
+    for (let b = 0; b < 3; b++) { ctx.save(); ctx.rotate(S.t * 14 + b * TAU / 3); ctx.beginPath(); ctx.ellipse(fr * 0.6, 0, fr * 0.6, fr * 0.18, 0, 0, TAU); ctx.fill(); ctx.restore(); }
+    ctx.restore();
+  }
+  else for (const fx of [W * 0.15, W * 0.85]) {
     const fy = G.ceilH * 0.62;
     ctx.save(); ctx.translate(fx, fy);
     ctx.fillStyle = 'rgba(60,60,70,.25)';
@@ -1676,6 +1693,8 @@ function drawInterior(){
     ctx.restore();
   }
   drawWindows();
+  if (artOk(ART.rack)) { const m2 = W * 0.05, pw2 = W * 0.07, ww2 = (W - 2 * m2 - pw2) / 2;
+    for (const x of [m2, m2 + ww2 + pw2]) { const dh = ww2 * ART.rack.naturalHeight / ART.rack.naturalWidth; ctx.drawImage(ART.rack, x - 4, G.winY0 - dh * 1.0, ww2 + 8, dh); } }
   drawFestival();
   const pY = G.winY1 + H * 0.018, bh = H * 0.036;
   ctx.fillStyle = '#a63d2a'; ctx.fillRect(-m, pY, W + 2 * m, bh);
@@ -1729,6 +1748,10 @@ function limb(x0, y0, x1, y1, x2, y2, w0, w1, c0, c1){
   ctx.strokeStyle = c0; ctx.lineWidth = w0; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
   ctx.strokeStyle = c1; ctx.lineWidth = w1; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
 }
+/* ---------- Illustrated assets generated with Figma AI (see art/figma and tools/process_art.py) ---------- */
+const ART = {};
+for (const n of ['bench', 'rack', 'fan', 'poster-chai', 'poster-vadapav', 'poster-sea']) { const im = new Image(); im.src = 'art/' + n + '.webp'; ART[n] = im; }
+const artOk = im => !!(im && im.complete && im.naturalWidth > 0);
 /* ---------- Ink style (Mario Miranda-inspired: confident black outlines, hatching, round-nosed caricatures) ---------- */
 const INK = '#1d1611';
 const inkW = (k = 1) => (1.6 * G.u + 0.9) * k;
@@ -1778,6 +1801,20 @@ const BACKROW = [
   { x: 0.82, s: 0.63, shirt: '#a63d2a', skin: '#9c6644', hair: '#161210', ph: 3.3, bindi: true }
 ];
 function drawBackRow(){
+  const im = ART.bench;
+  if (!artOk(im)) return drawBackRowInk();
+  const h = (G.floorY - G.winY1) * 0.82, w = h * im.naturalWidth / im.naturalHeight;
+  const sway = clamp(S.force * 0.02, -5, 5) + Math.sin(S.t * 1.2) * 1.2, y = G.floorY - H * 0.03 - h;
+  hatchRect(-20, G.floorY - H * 0.045, W + 40, H * 0.02, 0.35);
+  ctx.drawImage(im, (W - w) / 2 + sway, y + (S.cheerT > 0 ? -Math.abs(Math.sin(S.t * 12)) * 3 : 0), w, h);
+}
+function drawPoles(){ // stainless grab pole at the window pillar, floor to ceiling
+  const x = W * 0.05 + (W - 2 * W * 0.05 - W * 0.07) / 2 + W * 0.035, pw = Math.max(5, 7 * G.u);
+  const g = ctx.createLinearGradient(x - pw / 2, 0, x + pw / 2, 0); g.addColorStop(0, '#8d949b'); g.addColorStop(0.35, '#f3f6f8'); g.addColorStop(1, '#6b7279');
+  ctx.fillStyle = g; ctx.fillRect(x - pw / 2, G.railY, pw, G.floorY - G.railY - H * 0.01);
+  ctx.strokeStyle = INK; ctx.lineWidth = inkW(0.8); ctx.strokeRect(x - pw / 2, G.railY, pw, G.floorY - G.railY - H * 0.01);
+}
+function drawBackRowInk(){
   const hr = G.headR;
   for (const b of BACKROW) {
     const sc = b.s, bx = b.x * W + Math.sin(S.t * 1.3 + b.ph) * 2 + clamp(S.force * 0.03, -6, 6), by = G.winY1 + H * 0.06;
@@ -2376,7 +2413,7 @@ function render(){
   const z = 1 + 0.04 * S.danger; // push in on the player at the edge
   ctx.save();
   ctx.translate(W / 2 + ox, H * 0.55 + oy); ctx.rotate(roll); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.55);
-  drawInterior(); drawBgStraps(); drawBackRow(); drawCommuters(); drawChaiwala(); drawGhost(); drawPlayer(); drawForeground(); drawBubbles();
+  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); drawCommuters(); drawChaiwala(); drawGhost(); drawPlayer(); drawForeground(); drawBubbles();
   if (S.event === 'tunnel') { ctx.fillStyle = `rgba(10,5,25,${0.4 * evK()})`; ctx.fillRect(-80, -80, W + 160, H + 160); }
   ctx.restore();
   drawFx(); drawOffer(); drawBuffs(); drawBoard(); drawBanner(); drawTutorial(); if (S.state !== 'replay') { drawGauge(); drawTouchHints(); } drawReplayHud();
@@ -2497,7 +2534,7 @@ function portrait(key, acc){
 function artBg(k){ const c = CHARS[k].look.shirt; return `radial-gradient(circle at 50% 38%, ${shade(c, 40)} 0%, ${c} 55%, ${shade(c, -40)} 100%)`; }
 function coverEl(k, tag){
   const sp = document.createElement('span'); sp.className = 'cover'; sp.style.background = artBg(k);
-  const img = new Image(); img.alt = ''; img.src = portrait(k, k === save.char ? save.acc : ''); sp.appendChild(img);
+  const img = new Image(); img.alt = ''; img.src = 'art/char-' + k + '.webp'; img.className = 'charart'; sp.appendChild(img);
   if (tag) { const i = document.createElement('i'); i.textContent = tag; sp.appendChild(i); }
   return sp;
 }
@@ -2541,7 +2578,7 @@ function renderChars(focusKey){
     const c = CHARS[k], owned = save.owned.includes(k), cur = save.char === k, tx = ct(k);
     const el = document.createElement('div'); el.className = 'ccard' + (heroKey() === k ? ' sel' : '') + (owned ? '' : ' locked'); el.dataset.k = k;
     const art = document.createElement('div'); art.className = 'art'; art.style.background = artBg(k);
-    const img = new Image(); img.alt = tx.name; img.src = portrait(k, cur ? save.acc : ''); art.appendChild(img);
+    const img = new Image(); img.alt = tx.name; img.src = 'art/char-' + k + '.webp'; img.className = 'charart'; art.appendChild(img);
     if (cur) { const b = document.createElement('span'); b.className = 'badge2'; b.textContent = T('riding'); art.appendChild(b); }
     if (!owned) art.insertAdjacentHTML('beforeend', '<span class="lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span>');
     const body = document.createElement('div'); body.className = 'body';
@@ -2572,7 +2609,8 @@ function renderStyle(){
     const a = ACCESSORIES[k], owned = save.accOwned.includes(k), wearing = save.acc === k;
     const el = document.createElement('div'); el.className = 'scard' + (wearing ? ' sel' : '') + (owned ? '' : ' locked');
     const art = document.createElement('div'); art.className = 'art'; art.style.background = artBg(save.char);
-    const img = new Image(); img.alt = ''; img.src = portrait(save.char, k); art.appendChild(img);
+    const img = new Image(); img.alt = ''; img.src = 'art/item-' + k + '.webp'; img.className = 'itemart'; art.appendChild(img);
+    const mini = new Image(); mini.alt = ''; mini.src = portrait(save.char, k); mini.className = 'wearer'; art.appendChild(mini);
     const body = document.createElement('div'); body.className = 'body';
     const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = T('acc_' + k);
     const cta = document.createElement('button'); cta.className = 'cta';
@@ -2745,6 +2783,7 @@ on('charsBtn', () => { S.previewChar = null; shopTab = 'c'; renderChars(); close
 document.querySelectorAll('#shopTabs button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); shopTab = b.dataset.tab; renderChars(); }));
 document.querySelectorAll('#standSeg button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); save.stand = b.dataset.v; persist(); renderPickers(); }));
 on('chCard', () => startGame('challenge'));
+on('shopBtn', () => { S.previewChar = null; shopTab = 'c'; renderChars(); closePanel('start'); openPanel('chars'); });
 on('chBtn', sendChallenge);
 on('replayBtn', () => startReplay(false));
 on('replayShareBtn', () => startReplay(true));
