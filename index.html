@@ -119,8 +119,14 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 /* ---------- Sheets (iOS-style, slide up) ---------- */
 .sheet-wrap{justify-content:flex-end;background:rgba(0,0,0,.45);animation:fade .25s ease-out}
 .sheet{width:100%;max-height:88%;overflow-y:auto;background:#1c1c1e;border-radius:14px 14px 0 0;padding:6px 16px calc(var(--bot) + 18px);animation:up .32s cubic-bezier(.2,.9,.25,1);touch-action:pan-y;-webkit-overflow-scrolling:touch}
-#chars{background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.5))}
-#chars .sheet{max-height:60%}
+#chars{background:var(--bg)}
+#chars .sheet{height:100%;max-height:100%;border-radius:0;padding-top:calc(var(--top) + 10px);background:var(--bg);display:flex;flex-direction:column;animation:fade .2s ease-out}
+#chars .carousel{flex:1;align-items:center;min-height:0}
+#chars .sgrid{flex:1}
+body.sheet-open #muteBtn{display:none}
+#chars .grabber{display:none}
+.ccard{width:84%;max-width:340px}
+.ccard .art{aspect-ratio:.92}
 .grabber{width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:2px auto 10px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .sheet-head h2{font-size:22px;font-weight:700;letter-spacing:-.015em}
@@ -355,8 +361,7 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
       <div class="grabber"></div>
       <div class="sheet-head"><h2 data-i18n="shop">Shop</h2><button class="done" id="charsClose" data-i18n="done">Done</button></div>
       <p class="sheet-sub"><i class="coin"></i><span id="coinsChars" class="num">0</span></p>
-      <div class="seg" id="shopTabs"><button data-tab="c" class="on" data-i18n="commuters">Commuters</button><button data-tab="s" data-i18n="tabStyle">Style</button></div>
-      <div class="carousel" id="cgrid"></div>
+            <div class="carousel" id="cgrid"></div>
       <div class="sgrid hidden" id="sgrid"></div>
     </div>
   </div>
@@ -521,12 +526,9 @@ const CHARS = {
             look: { skin: '#8d5524', skinD: '#7a4720', shirt: '#f5f3ea', pat: 'plain', pants: '#f5f3ea', lower: 'pants', hair: 'cap', hairC: '#141010', mous: true, front: 'none', item: 'tiffin' } }
 };
 const CHAR_ORDER = ['rahul', 'desai', 'sunita', 'ganesh'];
-// Accessories: bought with coins, or earned with Daily Ride streaks
-const ACCESSORIES = {
-  idcard: { cost: 150 },  shades: { cost: 250 }, cap: { cost: 350 }, phones: { cost: 400 },
-  gajra:  { streak: 3 },  goldshades: { streak: 7 }, pheta: { streak: 30 }
-};
-const ACC_ORDER = ['idcard', 'shades', 'cap', 'phones', 'gajra', 'goldshades', 'pheta'];
+// Accessories were removed in v1.3.1 (they didn't sit well on the illustrated characters)
+const ACCESSORIES = {};
+const ACC_ORDER = [];
 function festivalToday(d){
   d = d || new Date(); const m = d.getMonth() + 1, day = d.getDate(), md = m * 100 + day;
   if (md >= 825 && md <= 920) return 'ganpati';
@@ -597,7 +599,7 @@ function normalize(s){
   if (!Array.isArray(d.missions)) d.missions = [];
   if (!Array.isArray(d.records)) d.records = [];
   if (!LINES[d.line]) d.line = 'western'; if (d.stand !== 'door') d.stand = 'middle';
-  if (!Array.isArray(d.accOwned)) d.accOwned = []; if (d.acc && !d.accOwned.includes(d.acc)) d.acc = '';
+  if (!Array.isArray(d.accOwned)) d.accOwned = []; d.acc = '';
   d.name = String(d.name || '').slice(0, 20);
   d.records = d.records.filter(r => r && typeof r.d === 'number').slice(0, 10);
   d.missions = d.missions.filter(m => m && MT[m.type]);
@@ -994,7 +996,7 @@ function reset(){
     rec: [], pendingSave: null, bestSave: null, trace: [], gaspArmed: true, shoutT: 0, replay: null, rideSecs: 0 });
   particles.length = 0; popups.length = 0;
 }
-function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records']) $(id).classList.add('hidden'); }
+function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records']) $(id).classList.add('hidden'); syncSheetOpen(); }
 const anyPanelOpen = () => ['chars', 'missions', 'settings', 'records'].some(id => !$(id).classList.contains('hidden'));
 function startGame(mode){
   mode = mode === 'daily' || mode === 'challenge' ? mode : 'normal';
@@ -1071,6 +1073,8 @@ function jerk(dir, mag, fx, quiet){
   S.tiltVel += dir * mag * (S.calmT > 0 ? 0.55 : 1);
   if (!fx) return;
   S.jerks++;
+  if (S.hang) S.hang.v -= dir * 90; COMMUTERS.forEach(cm => { if (cm.hang) cm.hang.v -= dir * 70; if (cm.feet) stumble(cm.feet, dir); });
+  stumble(S.feet, dir);
   S.shake = Math.max(S.shake, 0.4); S.jerkFx = 1; S.jerkDir = dir;
   S.speedLines = [];
   for (let i = 0; i < 10; i++) S.speedLines.push({ y: rand(H * 0.16, H * 0.82), len: rand(0.25, 0.6), w: rand(1.5, 4) });
@@ -1184,7 +1188,6 @@ function showOver(){
     const dly = save.daily, today = dayKey(), yesterday = dayKey(new Date(Date.now() - 864e5));
     if (dly.date !== today) { dly.streak = dly.date === yesterday ? dly.streak + 1 : 1; dly.date = today; dly.best = 0; dly.rewarded = false; }
     if (!dly.rewarded) { dly.rewarded = true; S.runCoins += DAILY_REWARD; banner(T('dailyReward'), '+' + DAILY_REWARD, '#30d158'); }
-    checkStreakRewards();
   }
   if (S.mode === 'daily') save.daily.best = Math.max(save.daily.best, Math.floor(S.dist));
   bankRun();
@@ -1341,6 +1344,7 @@ function update(dt){
   if (S.clutchDemo) S.tilt = clamp(S.tilt, -44.4, 44.4);
   if (tut) { S.tilt = clamp(S.tilt, -42, 42); if (Math.abs(S.tilt) >= 42) S.tiltVel = 0; tutorialUpdate(dt); }
   updateStrap(dt, false);
+  updateHangers(dt);
 
   // --- audio rhythm ---
   S.clackT -= dt;
@@ -1552,10 +1556,6 @@ function logRide(){
   st.rides++; st.secs += secs; st.saves += S.nears;
   st.recent.push([secs, Math.floor(S.dist), S.nears, S.line[0] || 'w', save.settings.easy ? 1 : 0]); if (st.recent.length > 50) st.recent.shift();
 }
-// --- Daily streak rewards ---
-function checkStreakRewards(){
-  for (const k of ACC_ORDER) { const a = ACCESSORIES[k]; if (a.streak && save.daily.streak >= a.streak && !save.accOwned.includes(k)) { save.accOwned.push(k); banner(T('streakReward', a.streak), T('acc_' + k), '#ff9f0a'); } }
-}
 
 /* ================= Render: scene ================= */
 function evK(){ // event visual intensity with fade in/out
@@ -1731,7 +1731,7 @@ function drawStrap(x, angle, L, scale){
   ctx.restore();
 }
 function drawBgStraps(){
-  if (sprReady && sprOk('oldman-calm')) { for (const x of [0.34, 0.63]) drawStrap(x * W, bgStraps[0].a, G.bgL, 0.85); return; } // illustrated commuters bring their own straps
+  if (sprReady && sprOk('oldman-calm')) return; // illustrated commuters bring their own straps; no stray empty straps near the player
   for (const b of bgStraps) {
     const x = b.x * W;
     drawStrap(x, b.a, G.bgL, 0.85);
@@ -1968,7 +1968,7 @@ function drawHair(hr, Lk){
   }
 }
 function drawAccessoryHead(hr, acc, Lk){
-  if (!acc) return;
+  return; // accessories removed
   if (acc === 'shades' || acc === 'goldshades') {
     const lens = acc === 'goldshades' ? '#3a2a05' : '#15151a', rim = acc === 'goldshades' ? '#e8b020' : INK;
     ctx.fillStyle = lens; ctx.strokeStyle = rim; ctx.lineWidth = hr * 0.08;
@@ -2072,7 +2072,7 @@ function drawPlayer(forceKey, accOverride){
   } else if (Lk.front === 'pallu') {
     ctx.beginPath(); ctx.moveTo(-tw * 0.5, -h + 4); ctx.lineTo(-tw * 0.15, -h); ctx.lineTo(tw * 0.5, -leg - tor * 0.2); ctx.lineTo(tw * 0.5, -leg + 2); ctx.lineTo(tw * 0.25, -leg + 2); ctx.closePath(); fillInk(Lk.drape, 0.9);
   }
-  if (acc === 'idcard') { // lanyard + card
+  if (false) { // accessories removed
     ctx.strokeStyle = '#1f4fa8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-tw * 0.15, -h + 2); ctx.lineTo(0, -h + tor * 0.42); ctx.lineTo(tw * 0.15, -h + 2); ctx.stroke();
     ctx.beginPath(); rr(ctx, -tw * 0.13, -h + tor * 0.42, tw * 0.26, tw * 0.34, 3); fillInk('#ffffff', 0.7);
     ctx.fillStyle = '#1f4fa8'; ctx.fillRect(-tw * 0.13 + 1, -h + tor * 0.42 + 1, tw * 0.26 - 2, tw * 0.09);
@@ -2255,8 +2255,9 @@ function drawReplayHud(){
 const SPR = {};
 let sprReady = false;
 fetch('art/sprites.json').then(r => r.json()).then(m => {
-  let left = Object.keys(m).length;
-  for (const [k, v] of Object.entries(m)) {
+  const ents = Object.entries(m).filter(([k]) => k[0] !== '_'); // '_' keys are build metadata, not images
+  let left = ents.length;
+  for (const [k, v] of ents) {
     const im = new Image(); im.onload = im.onerror = () => { if (--left === 0) { sprReady = true; for (const c in portraitCache) delete portraitCache[c]; if (S.state === 'menu') refreshMenus(); } };
     im.src = 'art/' + k + '.webp'; SPR[k] = Object.assign({ img: im }, v);
   }
@@ -2264,8 +2265,6 @@ fetch('art/sprites.json').then(r => r.json()).then(m => {
 const sprOk = k => !!(SPR[k] && artOk(SPR[k].img));
 // eye-line centre (x, y as fractions of the calm sprite) and face half-width (fraction of width), measured from the art
 const HEAD = { rahul: { x: 0.41, y: 0.31, r: 0.28, top: 0.2 }, desai: { x: 0.55, y: 0.31, r: 0.23, top: 0.24 }, sunita: { x: 0.42, y: 0.31, r: 0.19, top: 0.235 }, ganesh: { x: 0.48, y: 0.32, r: 0.285, top: 0.2 } };
-const ACC_IMG = {};
-for (const k of ['idcard', 'shades', 'cap', 'phones', 'gajra', 'goldshades', 'pheta']) { const im = new Image(); im.src = 'art/item-' + k + '.webp'; ACC_IMG[k] = im; }
 // one shared scale per character, from its calm pose: feet on the floor, ring just below the rail
 function charScale(key){
   const c = SPR['p-' + key + '-calm'];
@@ -2275,81 +2274,143 @@ function poseKey(key, mood, seated){
   const p = seated ? 'sit' : mood === 'ko' ? 'panic' : (mood === 'calm' || mood === 'worry' || mood === 'panic' || mood === 'relief') ? mood : 'calm';
   return 'p-' + key + '-' + p;
 }
-function drawAccOnSprite(key, acc, sp, sc){ // in sprite-local space (origin at the feet), before rotation is applied by the caller
-  const hd = HEAD[key], im = ACC_IMG[acc]; if (!hd || !im || !artOk(im)) return;
-  const c = SPR['p-' + key + '-calm'], rw = hd.r * c.w * sc;
-  const ex = (hd.x * c.w - c.foot[0]) * sc, ey = (hd.y * c.h - c.foot[1]) * sc, topY = (hd.top * c.h - c.foot[1]) * sc;
-  const ar = im.naturalHeight / im.naturalWidth; let w, x, y;
-  if (acc === 'shades' || acc === 'goldshades') { w = rw * 2.05; x = ex - w / 2; y = ey - w * ar * 0.5; }
-  else if (acc === 'cap') { w = rw * 2.5; x = ex - w * 0.45; y = topY - w * ar * 0.42; }
-  else if (acc === 'phones') { w = rw * 2.5; x = ex - w / 2; y = topY - rw * 0.15; }
-  else if (acc === 'pheta') { w = rw * 2.35; x = ex - w / 2; y = topY - w * ar * 0.55; }
-  else if (acc === 'gajra') { w = rw * 1.1; x = ex + rw * 0.55; y = ey - rw * 0.2; }
-  else if (acc === 'idcard') { w = rw * 0.9; x = ex - w / 2; y = ey + rw * 1.25; }
-  ctx.drawImage(im, x, y, w, w * ar);
-}
-function liveStrap(px, py, rx, ry){ // leather strap from the rail clamp down to the top of the ring
+function liveStrap(px, py, rx, ry){ // leather strap from the rail clamp down to the ring
   ctx.lineCap = 'round';
   ctx.strokeStyle = INK; ctx.lineWidth = 8 * G.u + 4; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(rx, ry); ctx.stroke();
   ctx.strokeStyle = '#6b4226'; ctx.lineWidth = 8 * G.u + 1; ctx.stroke();
   ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px - 2, py); ctx.lineTo(rx - 2, ry); ctx.stroke();
   ctx.fillStyle = '#9aa1a8'; rr(ctx, px - 9 * G.u, py - 6 * G.u, 18 * G.u, 11 * G.u, 3); ctx.fill(); ink(0.7);
 }
+// ---- hanging physics: the strap is a fixed-length leather loop whose clamp slides along the rail.
+//      The body tilts from the feet; the raised arm hinges at the shoulder and reaches the ring. ----
+const STRAP_L = () => G.L * 0.42;
+// body chain: legs lean ~45% of the angle, the upper body bends the rest of the way at the hips
+function chain(sp, sc, fx, fy, ang, flip, st){
+  const off = st ? st.off : 0, hop = st ? st.hop : 0, kick = st ? st.kick : 0;
+  const hipRow = sp.hip || sp.h * 0.6, aL = ang * 0.45 + kick, aU = ang * 1.12;
+  const feetX = fx + off, feetY = fy - hop, hl = (hipRow - sp.foot[1]) * sc;
+  const hipX = feetX - hl * Math.sin(aL), hipY = feetY + hl * Math.cos(aL), cu = Math.cos(aU), su = Math.sin(aU);
+  const up = (x, y) => { const lx = (x - sp.foot[0]) * sc * flip, ly = (y - hipRow) * sc; return [hipX + lx * cu - ly * su, hipY + lx * su + ly * cu]; };
+  return { aL, aU, feetX, feetY, hipX, hipY, hipRow, up };
+}
+const newFeet = () => ({ off: 0, from: 0, to: 0, t: 1, dur: 0, hop: 0, kick: 0 });
+// footwork: the feet drift under the lean in quick little steps (with a lift), and stumble on a jerk
+function stepFeet(st, leanDeg, dt){
+  if (st.t < st.dur) {
+    st.t += dt; const p = Math.min(1, st.t / st.dur), e = p * p * (3 - 2 * p);
+    st.off = lerp(st.from, st.to, e); st.hop = Math.sin(Math.PI * p) * 7 * G.u; st.kick = Math.sin(Math.PI * p) * 0.08 * Math.sign(st.to - st.from);
+    if (p >= 1 && st === S.feet && canPlay()) { const t = AC.currentTime + 0.005; noise(t, 0.04, 0.08, 'lowpass', 900, 0, 1); }
+  } else {
+    st.hop = 0; st.kick = 0;
+    const want = clamp(leanDeg * 0.95, -36, 36) * G.u, d = want - st.off;
+    if (Math.abs(d) > 10 * G.u) { st.from = st.off; st.to = st.off + Math.sign(d) * Math.min(Math.abs(d), 18 * G.u); st.t = 0; st.dur = 0.16; }
+  }
+}
+function stumble(st, dir){ if (!st) return; st.from = st.off; st.to = clamp(st.off + dir * 16 * G.u, -42 * G.u, 42 * G.u); st.t = 0; st.dur = 0.14; }
+function shoulderOf(sp, sc, fx, fy, ang, flip, st){
+  const a = sp.arm; if (!a) return null; const C = chain(sp, sc, fx, fy, ang, flip, st), sh = C.up(a.sx, a.sy);
+  return { sx: sh[0], sy: sh[1], armLen: (a.sy - a.ty) * sc, C };
+}
+function stepHanger(h, targetX, dt){ // the clamp slides toward the point above the shoulder, with weight and overshoot
+  if (h.x === undefined) { h.x = targetX; h.v = 0; }
+  h.v += (34 * (targetX - h.x) - 5.5 * h.v) * dt; h.x += h.v * dt;
+}
+function updateHangers(dt){
+  if (!sprReady) return;
+  const key = heroKey(), sp = SPR[poseKey(key, moodOf(), false)] || SPR['p-' + key + '-calm'];
+  S.feet = S.feet || newFeet();
+  if (S.seatT <= 0 && S.state !== 'falling') stepFeet(S.feet, S.tilt, dt);
+  if (sp && sp.arm) { const g = shoulderOf(sp, charScale(key), G.cx, G.floorY, S.tilt * DEG, 1, S.feet); if (g) stepHanger(S.hang || (S.hang = {}), g.sx, dt); }
+  COMMUTERS.forEach((cm, idx) => {
+    const set = NEIGH[idx], sp2 = SPR[set + '-calm']; if (!sp2 || !sp2.arm) return;
+    cm.feet = cm.feet || newFeet(); const ang = commuterAng(cm, idx);
+    stepFeet(cm.feet, ang / DEG * 1.6, dt);
+    const g = shoulderOf(sp2, neighScale(set), cm.x * W, G.floorY - H * 0.012, ang, idx >= 2 ? -1 : 1, cm.feet);
+    if (g) stepHanger(cm.hang || (cm.hang = {}), g.sx, dt);
+  });
+}
+function neighScale(set){ const c = SPR[set + '-calm']; return (G.floorY - (G.railY + G.L * 0.32)) / (c.foot[1] - c.top[1]) * 0.9; }
+function commuterAng(cm, idx){
+  const sleeper = S.event === 'sleepy' ? (S.evSide > 0 ? 1 : 2) : -1;
+  let ang = clamp(S.force * 0.0018, -0.25, 0.25) + Math.sin(S.t * 1.7 + cm.ph) * 0.025;
+  if (idx === sleeper) ang += S.evSide * 0.16 * evK();
+  if (S.glare && S.glare.idx === idx) ang += (idx >= 2 ? 0.05 : -0.05);
+  return ang;
+}
+function drawHanger(sp, sc, fx, fy, ang, flip, hang, opts, st){
+  const k = opts.key, split = sp.arm && sprOk(k + '-lower') && sprOk(k + '-upper') && sprOk(k + '-arm');
+  if (!split) { // fallback: whole sprite tilted around the feet, strap straight to the ring
+    ctx.save(); ctx.translate(fx, fy); ctx.rotate(ang); ctx.scale(flip, 1); ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
+    ctx.restore();
+    const lx = (sp.top[0] - sp.foot[0]) * sc * flip, ly = (sp.top[1] - sp.foot[1]) * sc, c = Math.cos(ang), s2 = Math.sin(ang);
+    liveStrap(hang && hang.x !== undefined ? hang.x : fx + lx, G.railY, fx + lx * c - ly * s2, fy + lx * s2 + ly * c + 2);
+    opts.head = null; return;
+  }
+  const C = chain(sp, sc, fx + (opts.jit || 0), fy + (opts.bob || 0), ang, flip, st), lo = SPR[k + '-lower'].img, upi = SPR[k + '-upper'].img;
+  // 1) legs, from the feet (they step and lift)
+  ctx.save(); ctx.translate(C.feetX, C.feetY); ctx.rotate(C.aL); ctx.scale(flip, 1);
+  ctx.drawImage(lo, -sp.foot[0] * sc, (C.hipRow - sp.ov - sp.foot[1]) * sc, sp.w * sc, lo.naturalHeight * sc); ctx.restore();
+  // 2) upper body, bending at the hips
+  ctx.save(); ctx.translate(C.hipX, C.hipY); ctx.rotate(C.aU); ctx.scale(flip, 1);
+  ctx.drawImage(upi, -sp.foot[0] * sc, -C.hipRow * sc, sp.w * sc, upi.naturalHeight * sc);
+  ctx.restore();
+  // 3) strap + arm: fixed-length strap from the sliding clamp; the arm hinges at the shoulder to reach the ring
+  const a = sp.arm, sh = C.up(a.sx, a.sy), gsx = sh[0], gsy = sh[1], armLen = (a.sy - a.ty) * sc;
+  const px = hang && hang.x !== undefined ? hang.x : gsx, py = G.railY;
+  const dx = gsx - px, dy = gsy - py, dist = Math.hypot(dx, dy), ux = dx / dist, uy = dy / dist;
+  const L = STRAP_L(); let stretch = (dist - L) / armLen, Lr = L, slack = 0;
+  if (stretch > 1.22) { stretch = 1.22; Lr = dist - armLen * 1.22; }
+  else if (stretch < 0.86) { stretch = 0.86; Lr = dist - armLen * 0.86; slack = L - Lr; }
+  const hx = px + ux * Lr, hy = py + uy * Lr;
+  if (slack > 1) {
+    ctx.lineCap = 'round'; const sgn = hang && hang.v > 0 ? 1 : -1, mx = (px + hx) / 2 - uy * slack * 0.45 * sgn, my = (py + hy) / 2 + ux * slack * 0.2;
+    ctx.strokeStyle = INK; ctx.lineWidth = 8 * G.u + 4; ctx.beginPath(); ctx.moveTo(px, py); ctx.quadraticCurveTo(mx, my, hx, hy); ctx.stroke();
+    ctx.strokeStyle = '#6b4226'; ctx.lineWidth = 8 * G.u + 1; ctx.stroke();
+    ctx.fillStyle = '#9aa1a8'; rr(ctx, px - 9 * G.u, py - 6 * G.u, 18 * G.u, 11 * G.u, 3); ctx.fill(); ink(0.7);
+  } else liveStrap(px, py, hx, hy);
+  const beta = Math.atan2(hx - gsx, -(hy - gsy)), alpha0 = Math.atan2((a.tx - a.sx) * flip, -(a.ty - a.sy));
+  ctx.save(); ctx.translate(gsx, gsy); ctx.rotate(beta); ctx.scale(1, stretch); ctx.rotate(-alpha0); ctx.scale(flip, 1);
+  ctx.drawImage(SPR[k + '-arm'].img, (a.x0 - a.sx) * sc, (a.y0 - a.sy) * sc, a.w * sc, a.h * sc);
+  ctx.restore();
+  const f = sp.face; opts.head = f ? C.up(f.ex, f.y0) : null;
+}
 function drawPlayerSprite(){
   const key = heroKey(); if (!sprReady || !sprOk('p-' + key + '-calm')) return false;
   const mood = moodOf(), seated = S.seatT > 0, pk = poseKey(key, mood, seated && S.seatT > 0.35 && S.seatT < 5.65);
   const sp = SPR[pk] || SPR['p-' + key + '-calm'], c = SPR['p-' + key + '-calm'], sc = charScale(key);
   const th = seated ? 0 : S.tilt * DEG, fx = G.cx, fy = G.floorY;
-  const pivotX = fx + (c.top[0] - c.foot[0]) * sc; G.px = pivotX;
-  // hatched floor shadow
+  G.px = S.hang && S.hang.x !== undefined ? S.hang.x : fx + (c.top[0] - c.foot[0]) * sc;
   ctx.save(); ctx.beginPath(); ctx.ellipse(fx + Math.sin(th) * 20, fy + 4, G.tw * 0.85, G.tw * 0.15, 0, 0, TAU); ctx.clip(); hatchRect(fx - G.tw * 1.3, fy - G.tw, G.tw * 2.8, G.tw * 2, 0.7); ctx.restore();
   const isSit = pk.endsWith('-sit');
-  if (isSit) { // the seat you won: a brown bench under the hips
-    const bh = sp.h * sc * 0.4; ctx.beginPath(); rr(ctx, fx - G.tw, fy - bh, G.tw * 2, G.tw * 0.26, 6); fillInk('#8a5a33', 1);
-    ctx.beginPath(); rr(ctx, fx - G.tw * 0.9, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
-    ctx.beginPath(); rr(ctx, fx + G.tw * 0.76, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
-    drawStrap(pivotX, S.strapA, G.L * 1.1, 1); // the empty strap swings above
+  if (isSit || mood === 'ko') {
+    if (isSit) { const bh = sp.h * sc * 0.4; ctx.beginPath(); rr(ctx, fx - G.tw, fy - bh, G.tw * 2, G.tw * 0.26, 6); fillInk('#8a5a33', 1);
+      ctx.beginPath(); rr(ctx, fx - G.tw * 0.9, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
+      ctx.beginPath(); rr(ctx, fx + G.tw * 0.76, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8); }
+    drawStrap(G.px, S.strapA, G.L * 1.1, 1); // empty strap swings free
+    ctx.save(); ctx.translate(fx, fy); ctx.rotate(th); ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
+    ctx.restore();
+  } else {
+    const ho = { key: pk, heroKey: key, acc: save.acc, jit: mood === 'panic' ? (Math.random() - 0.5) * 1.6 : 0, bob: mood === 'relief' ? -Math.abs(Math.sin(S.t * 10)) * 3 : 0 };
+    drawHanger(sp, sc, fx, fy, th, 1, S.hang, ho, S.feet || (S.feet = newFeet()));
+    if (ho.head) { S.headX = ho.head[0]; S.headY = ho.head[1]; }
   }
-  const lx = (sp.top[0] - sp.foot[0]) * sc, ly = (sp.top[1] - sp.foot[1]) * sc; // ring top in local space
   const cth = Math.cos(th), sth = Math.sin(th);
-  const ringX = fx + lx * cth - ly * sth, ringY = fy + lx * sth + ly * cth;
-  if (!isSit && mood !== 'ko') liveStrap(pivotX, G.railY, ringX, ringY + 2);
-  if (mood === 'ko') drawStrap(pivotX, S.strapA, G.L, 1); // let go: the strap swings free
-  const jit = mood === 'panic' ? (Math.random() - 0.5) * 1.6 : 0, bob = mood === 'relief' ? -Math.abs(Math.sin(S.t * 10)) * 3 : 0;
-  ctx.save(); ctx.translate(fx + jit, fy + bob); ctx.rotate(th);
-  ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
-  const acc = save.acc; if (acc && !isSit) drawAccOnSprite(key, acc, sp, sc);
-  ctx.restore();
-  // head + shoulder positions (speech bubbles, fall particles)
-  const hd = HEAD[key] || { x: 0.45, y: 0.3 }, hx = (hd.x * c.w - c.foot[0]) * sc, hy = (hd.top * c.h - c.foot[1]) * sc;
-  S.headX = fx + hx * cth - hy * sth; S.headY = fy + hx * sth + hy * cth;
+  if (isSit || mood === 'ko') { const f = sp.face || c.face, hx = f ? (f.ex - sp.foot[0]) * sc : 0, hy = f ? (f.y0 - sp.foot[1]) * sc : -sp.h * sc * 0.75; S.headX = fx + hx * cth - hy * sth; S.headY = fy + hx * sth + hy * cth; }
   const sy0 = -c.h * sc * 0.6; S.shX = fx - sy0 * sth; S.shY = fy + sy0 * cth;
   return true;
 }
 const NEIGH = ['oldman', 'saree', 'specs', 'mustard'];
 function drawCommuterSprites(){
   if (!sprReady || !sprOk('oldman-calm')) return false;
-  const sleeper = S.event === 'sleepy' ? (S.evSide > 0 ? 1 : 2) : -1, sk = evK();
+  const sleeper = S.event === 'sleepy' ? (S.evSide > 0 ? 1 : 2) : -1;
   COMMUTERS.forEach((cm, idx) => {
     const set = NEIGH[idx], glaring = S.glare && S.glare.idx === idx, cheering = S.cheerT > 0;
-    const sp = SPR[set + '-' + (cheering ? 'cheer' : glaring ? 'glare' : 'calm')] || SPR[set + '-calm'], c = SPR[set + '-calm'];
-    const flip = idx >= 2 ? -1 : 1, depth = 0.9;
-    const sc = (G.floorY - (G.railY + G.L * 0.32)) / (c.foot[1] - c.top[1]) * depth;
-    let ang = clamp(S.force * 0.0018, -0.25, 0.25) + Math.sin(S.t * 1.7 + cm.ph) * 0.025;
-    if (idx === sleeper) ang += S.evSide * 0.16 * sk;
-    if (glaring) ang += (idx >= 2 ? 0.05 : -0.05);
+    const k = set + '-' + (cheering ? 'cheer' : glaring ? 'glare' : 'calm'), sp = SPR[k] || SPR[set + '-calm'];
+    const flip = idx >= 2 ? -1 : 1, sc = neighScale(set), ang = commuterAng(cm, idx);
     const bx = cm.x * W, by = G.floorY - H * 0.012;
     ctx.save(); ctx.beginPath(); ctx.ellipse(bx, by + 3, G.tw * 0.55, G.tw * 0.11, 0, 0, TAU); ctx.clip(); hatchRect(bx - G.tw, by - G.tw, G.tw * 2, G.tw * 2, 0.55); ctx.restore();
-    const lx = (sp.top[0] - sp.foot[0]) * sc * flip, ly = (sp.top[1] - sp.foot[1]) * sc;
-    const ca = Math.cos(ang), sa = Math.sin(ang);
-    const rx = bx + lx * ca - ly * sa, ry = by + lx * sa + ly * ca;
-    const pivot = bx + (c.top[0] - c.foot[0]) * sc * flip;
-    liveStrap(pivot, G.railY, rx, ry + 2);
-    ctx.save(); ctx.translate(bx, by); ctx.rotate(ang); ctx.scale(flip, 1);
-    ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
-    ctx.restore();
-    const hx = (sp.w * 0.45 - sp.foot[0]) * sc * flip, hy = (sp.h * 0.22 - sp.foot[1]) * sc;
-    cm.hx = bx + hx * ca - hy * sa; cm.hy = by + hx * sa + hy * ca;
+    const ho = { key: k }; drawHanger(sp, sc, bx, by, ang, flip, cm.hang, ho, cm.feet || (cm.feet = newFeet()));
+    if (ho.head) { cm.hx = ho.head[0]; cm.hy = ho.head[1]; } else { cm.hx = bx; cm.hy = by - sp.h * sc * 0.8; }
     if (idx === sleeper) { ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.font = `700 ${Math.round(14 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'center'; const zy = cm.hy - G.headR * 1.4 - Math.sin(S.t * 3) * 4; ctx.strokeText('Zzz', cm.hx, zy); ctx.fillText('Zzz', cm.hx, zy); }
   });
   return true;
@@ -2376,7 +2437,6 @@ function spritePortrait(key, acc){
   try {
     ctx = oc; ctx.save(); ctx.translate(150 - (c.w * 0.5 - c.foot[0]) * sc, c.foot[1] * sc - (HEAD[key] ? HEAD[key].top * c.h * sc - 20 : 0));
     ctx.drawImage(c.img, -c.foot[0] * sc, -c.foot[1] * sc, c.w * sc, c.h * sc);
-    if (acc) drawAccOnSprite(key, acc, c, sc);
     ctx.restore();
   } finally { ctx = keep; }
   return out.toDataURL('image/png');
@@ -2812,8 +2872,9 @@ function refreshMenus(){
   applyAudio();
 }
 let settingsFrom = 'start';
-function openPanel(id){ $(id).classList.remove('hidden'); }
-function closePanel(id){ $(id).classList.add('hidden'); }
+function syncSheetOpen(){ document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet-wrap:not(.hidden)')); } // the floating sound button would cover the sheets' Done button
+function openPanel(id){ $(id).classList.remove('hidden'); syncSheetOpen(); }
+function closePanel(id){ $(id).classList.add('hidden'); syncSheetOpen(); }
 
 /* ---------- Share card ---------- */
 async function shareScore(){
@@ -2915,7 +2976,7 @@ on('pauseBtn', pause);
 on('skipTut', finishTutorial);
 on('muteBtn', e => { e.stopPropagation(); toggleMute(); });
 on('charsBtn', () => { S.previewChar = null; shopTab = 'c'; renderChars(); closePanel('start'); openPanel('chars'); });
-document.querySelectorAll('#shopTabs button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); shopTab = b.dataset.tab; renderChars(); }));
+document.querySelectorAll('#shopTabs button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); shopTab = 'c'; renderChars(); }));
 document.querySelectorAll('#standSeg button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); save.stand = b.dataset.v; persist(); renderPickers(); }));
 on('chCard', () => startGame('challenge'));
 on('shopBtn', () => { S.previewChar = null; shopTab = 'c'; renderChars(); closePanel('start'); openPanel('chars'); });
