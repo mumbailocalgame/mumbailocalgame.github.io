@@ -3,6 +3,12 @@
 // have a native speaker review them before release.
 window.MLS_I18N = {
   en: {
+    pickStand: "Where you stand",
+    pickLine: "Line",
+    abil_ganesh: "Quick hands",
+    abil_sunita: "Iron grip",
+    abil_desai: "Anchor",
+    abil_rahul: "All-rounder",
     noTap: "Don't tap. Hold it down!",
     holdSub: "keep your finger down",
     you: "You",
@@ -178,6 +184,12 @@ window.MLS_I18N = {
   },
 
   hi: {
+    pickStand: "कहाँ खड़े हों",
+    pickLine: "लाइन",
+    abil_ganesh: "फुर्तीले हाथ",
+    abil_sunita: "लोहे की पकड़",
+    abil_desai: "एंकर",
+    abil_rahul: "ऑल-राउंडर",
     noTap: "टैप नहीं, दबाए रखो!",
     holdSub: "उंगली दबाए रखें",
     you: "आप",
@@ -353,6 +365,12 @@ window.MLS_I18N = {
   },
 
   mr: {
+    pickStand: "कुठे उभे राहाल",
+    pickLine: "मार्ग",
+    abil_ganesh: "चपळ हात",
+    abil_sunita: "लोखंडी पकड",
+    abil_desai: "नांगर",
+    abil_rahul: "ऑल-राउंडर",
     noTap: "टॅप नको, दाबून ठेवा!",
     holdSub: "बोट दाबून ठेवा",
     you: "तुम्ही",

@@ -48,9 +48,10 @@ On a computer: the ← → arrow keys (or A/D).
 | Leaderboards | **Two global leaderboards:** longest single ride, and total distance over all rides. Pick a nickname, no account. Your rank is shown. |
 | "Scalability" | Leaderboard on Supabase (Postgres): players can read only names and scores, writes go through one function that only lets scores rise and rejects impossible values, indexed top-50 queries. The game itself is static files on a CDN, so there's no game server to scale. Lines, stations and events are data tables. |
 | "Controls (hold vs tap) unclear" | **Animated hand coach** in the tutorial: the hand presses and holds, and a ring fills only while the finger stays down. A quick tap shows "Don't tap. Hold it down!" The instructions now say "Press and HOLD". |
-| UI "not good enough for a game" | **New comic-ink UI** inspired by Apple Design Award games (Alto's Odyssey, Lost in Play): the live carriage is the home screen, and menus are cream paper cards with thick ink outlines and pressable buttons, matching the illustrated characters. |
+| UI "looks AI-generated, not like a game" | **New tactical game UI** styled after competitive shooter lobbies such as Valorant: deep navy, one signal red, sharp angled panels, uppercase tracked labels, hexagonal level badges, and an agent-select roster where each commuter shows a signature ability card. The live carriage is the home screen. No third-party logos or assets are used. |
+| "Make it easier to understand and click" | **Simpler home layout:** one full-width PLAY button under the route, labelled choices ("Line", "Where you stand"), locked lines show the level that opens them, and every tap target is at least 48 px tall. Checked on 360×640, 375×667, 390×844 and 430×932 screens. |
 
-Bug fixed while testing: in the tutorial, the forced 42° lean pushed the player's body and strap off the screen; the tutorial lean is now capped at 34°.
+Bugs fixed: on opening the game, the old placeholder characters showed for a moment before the illustrated ones loaded. A loading screen now holds until the art is ready, and the placeholders are never drawn during loading. Also, in the tutorial, the forced 42° lean pushed the player's body and strap off the screen; the tutorial lean is now capped at 34°.
 
 ## What changed in v1.3.1
 - **Illustrated characters in the game:** the four commuters, the neighbours and the chaiwala are now drawn from the same Figma AI illustrations used in the shop, not simple canvas shapes.
