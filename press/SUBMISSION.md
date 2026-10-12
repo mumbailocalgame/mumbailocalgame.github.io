@@ -8,12 +8,12 @@
 | Team member email | sijojoseph7509@gmail.com |
 | Project title | **Mumbai Local Straphanger** |
 | Playable game | https://mumbailocalgame.github.io/ |
-| Documentation (PDF) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
+| Documentation (PDF, 17 pages) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
 | Video (trailer, 45 s) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-trailer.mp4 |
 | Press kit (all of the above on one page) | https://mumbailocalgame.github.io/press/ |
 | Everything in one ZIP | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-submission.zip |
 
-All links were checked again after the final v1.3.1 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
+All links were checked again after the v1.4 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
 
 ### Optional mirrors (if the judges prefer Google Drive / YouTube)
 The rules list Google Docs/Slides/Drive for documents and YouTube/Drive for videos as examples ("you may use…"). The links above already meet the requirement. To add mirrors:
@@ -34,13 +34,25 @@ Mumbai Local Straphanger is built around one moment every Mumbai commuter knows:
 On a computer: the ← → arrow keys (or A/D).
 
 ## Files in this folder
-- `mumbai-local-straphanger-design-doc.pdf`: 15-page game design document (v1.3) (source: `doc/design-doc.html`)
+- `mumbai-local-straphanger-design-doc.pdf`: 17-page game design document (v1.3) (source: `doc/design-doc.html`)
 - `mumbai-local-straphanger-trailer.mp4`: 45 s vertical trailer with soundtrack (built by `../tools/make_trailer.py`)
 - `press/`: the press-kit page published at /press/
 
 ---
 
-## What changed in v1.3.1 (latest)
+## What changed in v1.4 (latest): answering judge feedback
+| Feedback | What we built |
+|---|---|
+| "No hook for the user to come back" | **Commuter pass:** every metre is 1 XP, every clutch save +15, the Daily Ride +100. Every level pays coins; levels 3/5/7/10/15 unlock the Central and Harbour lines, Desai Uncle, Sunita Aunty and Ganesh. Ranks go from Ticketless to Motorman, with no top level. The game-over screen shows the XP bar filling and the next unlock. |
+| "Finish 3 routes and you're done" | Lines are now earned through the pass, stations loop with laps (rides never end), and pass levels keep going. |
+| Leaderboards | **Two global leaderboards:** longest single ride, and total distance over all rides. Pick a nickname, no account. Your rank is shown. |
+| "Scalability" | Leaderboard on Supabase (Postgres): players can read only names and scores, writes go through one function that only lets scores rise and rejects impossible values, indexed top-50 queries. The game itself is static files on a CDN, so there's no game server to scale. Lines, stations and events are data tables. |
+| "Controls (hold vs tap) unclear" | **Animated hand coach** in the tutorial: the hand presses and holds, and a ring fills only while the finger stays down. A quick tap shows "Don't tap. Hold it down!" The instructions now say "Press and HOLD". |
+| UI "not good enough for a game" | **New comic-ink UI** inspired by Apple Design Award games (Alto's Odyssey, Lost in Play): the live carriage is the home screen, and menus are cream paper cards with thick ink outlines and pressable buttons, matching the illustrated characters. |
+
+Bug fixed while testing: in the tutorial, the forced 42° lean pushed the player's body and strap off the screen; the tutorial lean is now capped at 34°.
+
+## What changed in v1.3.1
 - **Illustrated characters in the game:** the four commuters, the neighbours and the chaiwala are now drawn from the same Figma AI illustrations used in the shop, not simple canvas shapes.
 - **Natural movement:** the body bends at the hips (legs lean less than the upper body), the arm hinges at the shoulder, and the strap keeps a fixed length while its clamp slides along the rail with spring and damping. The strap goes slack when the hand rises. Feet take small steps, hop and stumble on jerks.
 - **Full-screen shop:** it opens edge to edge, so the character art is no longer cut off, with the card centred vertically.

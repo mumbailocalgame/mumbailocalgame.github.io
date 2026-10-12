@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="fonts/fonts.css">
+<meta name="theme-color" content="#f4e7c8">
 <meta name="description" content="Hang on in a packed Mumbai local train! Lean, balance and survive the rush from Churchgate to Virar.">
 <meta property="og:title" content="Mumbai Local Straphanger">
 <meta property="og:description" content="Hold on. Lean. Survive the rush! A free balance game set in a packed Mumbai local train.">
@@ -235,6 +236,26 @@ button:active,.album:active,.row:active{transform:scale(.96)}
 .home .scroll>*:nth-child(5){animation-delay:.16s}.home .scroll>*:nth-child(6){animation-delay:.2s}.home .scroll>*:nth-child(7){animation-delay:.24s}.home .scroll>*:nth-child(8){animation-delay:.28s}
 /* --- home pickers --- */
 .pickers{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.passcard{background:linear-gradient(135deg,#2a2410,#1c1c1e 60%)}
+.lvl{flex:none;width:46px;height:46px;border-radius:50%;background:var(--accent);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.lvl small{font-size:9px;font-weight:700;letter-spacing:.06em;opacity:.7}.lvl b{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.xpbar{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.12);margin:5px 0 4px;overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent);transition:width .9s cubic-bezier(.2,.9,.25,1)}
+.opass{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:12px;padding:10px;margin:10px 0}
+.opass .row-text b{font-size:15px}
+.passlist{list-style:none;margin:6px 0 0}
+.passlist li{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:.5px solid rgba(255,255,255,.08);font-size:15px}
+.passlist li .n{width:34px;height:34px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.passlist li.got .n{background:var(--accent);color:var(--ink)}
+.passlist li.cur{background:rgba(255,214,10,.08);border-radius:10px}
+.passlist li .rw{flex:1;min-width:0}.passlist li .rw small{display:block;color:var(--text2);font-size:12px}
+.passlist li .st{color:var(--text2);font-size:13px;font-weight:600}
+.lbname{display:flex;gap:8px;margin:10px 0}
+.lbname input{flex:1;min-width:0;background:var(--surface2);border:.5px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;color:var(--text);font:inherit;font-size:16px}
+.lbname .primary{width:auto;margin:0;padding:0 18px}
+.lblist{margin-top:8px}.lblist li.me{background:rgba(255,214,10,.1);border-radius:10px}
+.lblist .lvs{font-size:10px;font-weight:700;background:var(--surface3);color:var(--text2);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+.seg button.lockd{opacity:.55}
 .seg{display:flex;background:var(--surface);border-radius:12px;padding:3px;gap:3px}
 .seg button{flex:1;padding:9px 6px;border-radius:9px;font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seg button.on{background:var(--surface3);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.35)}
@@ -288,6 +309,96 @@ img.charart{object-fit:contain!important;object-position:50% 100%;padding-top:6%
 .subhead{font-size:17px;font-weight:700;margin:6px 2px 8px}
 input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;border-radius:8px;padding:7px 10px;width:150px;text-align:right;-webkit-user-select:text;user-select:text}
 .route .st:nth-child(2) span{left:0}.route .st:last-child span{right:0}
+
+/* ================= v1.4 look: comic-ink game UI =================
+   Inspired by Apple Design Award games (Alto's Odyssey, Monument Valley, Lost in Play): the live train is the
+   menu, chrome stays out of the way, and every control looks like part of the same hand-inked world as the
+   characters: cream paper, thick ink outlines, hard offset shadows, station-board yellow, buttons you can press. */
+:root{
+  --bg:#f4e7c8;--surface:#fff8e7;--surface2:#fff3d6;--surface3:#f0dfb6;--sep:rgba(27,20,16,.14);
+  --text:#1b1410;--text2:rgba(27,20,16,.64);--text3:rgba(27,20,16,.38);
+  --accent:#ffcf1a;--ink:#1b1410;--green:#2f9e44;--red:#d9412a;--blue:#2563eb;
+  --line:2.5px solid var(--ink);--drop:3px 3px 0 var(--ink);
+}
+html,body{color:var(--text)}
+/* home: the animated carriage shows through the top; a paper tray rises from the bottom */
+.home{background:linear-gradient(180deg,rgba(244,231,200,0) 0%,rgba(244,231,200,0) 40%,rgba(244,231,200,.94) 52%,var(--bg) 60%)}
+.indicator{border:var(--line);box-shadow:var(--drop);border-radius:10px}
+.large-title{margin:14px 0 8px;transform:rotate(-2deg);transform-origin:left center}
+.large-title h1{display:inline-block;font-size:40px;color:var(--accent);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:4px 4px 0 var(--ink);letter-spacing:-.01em}
+.large-title p{display:inline-block;margin-top:4px;background:var(--ink);color:#fff8e7;font-size:14px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.04em;text-transform:uppercase}
+.hero{background:none!important;min-height:min(38vh,320px);padding:0;align-items:flex-end;overflow:visible;animation:none}
+.hero::before,.hero::after{display:none}
+.hero-meta{background:var(--surface);border:var(--line);box-shadow:var(--drop);border-radius:16px;padding:10px 14px;flex:1;min-width:0;position:relative}
+.hero-meta::before{content:"";position:absolute;right:-9px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--bg);border-left:var(--line)}
+.hero-meta small{color:var(--red)}
+.hero-meta h2{font-size:21px;color:var(--text)}
+.hero-meta p,.hero-meta p b{color:var(--text2)}
+.play{width:76px;height:76px;border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);animation:breathe 1.8s ease-in-out infinite}
+.play svg{width:30px;height:30px}
+.hero:active .play,.play:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink);animation:none}
+@keyframes breathe{50%{transform:scale(1.06)}}
+.row,.seg,.opass,.list,.mlist,.group,.stats div,.ccard,.scard{background:var(--surface);border:var(--line);box-shadow:var(--drop);border-radius:16px}
+.row{margin-top:12px;transition:transform .1s,box-shadow .1s}
+.row:active{background:var(--surface2);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.row .chev{stroke:var(--ink)}
+.row-icon{background:var(--accent);border:2px solid var(--ink);border-radius:12px}
+.row-icon svg{stroke:var(--ink)}
+.cal{border:2px solid var(--ink);border-radius:10px}
+.badge{border:2px solid var(--ink)}
+.passcard{background:linear-gradient(100deg,#fff1b8,var(--surface) 70%)}
+.lvl{border:2.5px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.xpbar{background:rgba(27,20,16,.12);border:1.5px solid var(--ink);height:9px;border-radius:5px}
+.xpbar i{background:repeating-linear-gradient(-45deg,var(--accent) 0 6px,#ffb800 6px 12px)}
+.seg{padding:4px;gap:4px}
+.seg button{color:var(--text2);font-weight:700;border-radius:11px}
+.seg button.on{background:var(--accent);color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.shelf-head h3{font-size:24px}
+.cover{border:var(--line);box-shadow:var(--drop);border-radius:14px}
+.album .s{color:var(--text2)}
+.tabbar{background:var(--surface);border-top:var(--line);padding-top:8px}
+.tab{color:var(--text3)}
+.tab.on{color:var(--ink)}
+.tab.on svg{background:var(--accent);border-radius:10px;box-shadow:0 0 0 2px var(--ink);padding:2px;width:30px;margin:-3px 0}
+/* sheets: a sheet of paper sliding up */
+.sheet-wrap{background:rgba(27,20,16,.5)}
+.sheet{background:var(--bg);border-top:3px solid var(--ink);border-radius:24px 24px 0 0}
+#chars .sheet{border-top:0}
+.grabber{background:rgba(27,20,16,.3)}
+.sheet-head h2{font-size:26px}
+.done{background:var(--ink);color:var(--accent);padding:6px 14px;border-radius:999px;font-size:15px;font-weight:700}
+.li+.li,.setrow+.setrow,.mission+.mission{border-top:1.5px dashed var(--sep)}
+.li b{color:var(--text)}
+.primary{border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);border-radius:18px;font-size:18px;margin-bottom:8px;transition:transform .08s,box-shadow .08s}
+.primary:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.primary.blue{background:var(--blue);color:#fff}
+.primary:disabled{opacity:.5}
+.secondary{background:var(--surface);border:var(--line);box-shadow:0 3px 0 var(--ink);border-radius:14px;color:var(--text)}
+.secondary:active{background:var(--surface2);transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.secondary.hl{background:var(--accent)}
+.over-sheet .eyebrow{display:inline-block;background:var(--red);color:#fff;padding:3px 10px;border-radius:6px;transform:rotate(-2deg)}
+.big-stat b{font-size:60px;-webkit-text-stroke:0}
+.nb{border:2px solid var(--ink)}
+.mission .bar{background:rgba(27,20,16,.12)}
+.toast{background:var(--ink);color:#fff8e7;border:2px solid var(--accent)}
+.reclist li.first .rk{color:var(--ink);background:var(--accent);border-radius:50%;border:2px solid var(--ink);width:26px;height:26px;line-height:22px}
+.lblist li.me{background:#fff1b8;box-shadow:inset 0 0 0 2px var(--ink)}
+.lblist .lvs{background:var(--ink);color:var(--accent)}
+.lbname input{background:var(--surface);border:var(--line);color:var(--text)}
+.passlist li{border-bottom:1.5px dashed var(--sep)}
+.passlist li .n{border:2px solid var(--ink)}
+.passlist li.cur{background:#fff1b8}
+.ccard.sel{box-shadow:0 0 0 3px var(--accent),var(--drop)}
+.ccard .art{border-bottom:var(--line)}
+/* in-game HUD: ink-outlined paper pills */
+.pill{background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none}
+.pill small{color:var(--text2)}
+.bar{background:rgba(27,20,16,.15)}
+.iconbtn,#skipTut{background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none}
+.iconbtn svg,#pauseBtn svg{stroke:var(--ink)}
+.lblist .rm b .lvs{color:#ffcf1a!important;background:#1b1410!important}
+.setlinks .setrow{color:var(--blue)!important;font-weight:600}
+.setlinks .setrow.danger{color:var(--red)!important}
 </style>
 </head>
 <body>
@@ -326,6 +437,11 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
         <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 17.5 21 6V3h-3L6.5 14.5M11 19l-6-6M8 16l-4 4M5 21l-2-2"/></svg></span>
         <span class="row-text"><b id="chCardT">Challenge</b><small id="chCardS"></small></span>
         <span class="badge" style="background:#fff;color:#0a3d7a" data-i18n="accept">Accept</span>
+      </button>
+      <button class="row passcard" id="passBtn">
+        <span class="lvl"><small data-i18n="lv">LV</small><b id="passLv">1</b></span>
+        <span class="row-text"><b id="passRank">Ticketless</b><span class="xpbar"><i id="passBar"></i></span><small id="passNext"></small></span>
+        <svg class="chev" viewBox="0 0 9 15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l6 6-6 6"/></svg>
       </button>
       <div class="pickers">
         <div class="seg" id="lineSeg"></div>
@@ -388,7 +504,17 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.3.0</p>
+      <p class="ver">Mumbai Local Straphanger 1.4.0</p>
+    </div>
+  </div>
+
+  <!-- COMMUTER PASS -->
+  <div id="pass" class="overlay sheet-wrap hidden">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 data-i18n="passTitle">Commuter pass</h2><button class="done" id="passClose" data-i18n="done">Done</button></div>
+      <p class="hint" data-i18n="passHow"></p>
+      <ol class="passlist" id="passList"></ol>
     </div>
   </div>
 
@@ -398,9 +524,13 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
       <div class="grabber"></div>
       <div class="sheet-head"><h2 data-i18n="recordsTitle">My best rides</h2><button class="done" id="recordsClose" data-i18n="done">Done</button></div>
       <div class="stats" id="recStats"></div>
+      <h3 class="subhead" data-i18n="lbTitle">Leaderboard</h3>
+      <div class="seg" id="lbSeg"><button data-b="best" class="on" data-i18n="lbBest">Longest ride</button><button data-b="total" data-i18n="lbTotal">Total distance</button></div>
+      <div class="lbname hidden" id="lbName"><input id="lbNameIn" maxlength="16" autocomplete="off" spellcheck="false"><button class="primary" id="lbNameSave" data-i18n="lbJoin">Join</button></div>
+      <ol class="reclist lblist" id="lbList"></ol>
+      <p class="hint" id="lbHint"></p>
+      <h3 class="subhead" style="margin-top:16px" data-i18n="recordsTitle">My best rides</h3>
       <ol class="reclist" id="reclist"></ol>
-      <h3 class="subhead" data-i18n="lbTitle">Daily leaderboard</h3>
-      <p class="hint" data-i18n="lbOff"></p>
       <h3 class="subhead" style="margin-top:16px" data-i18n="playtest">Playtest data</h3>
       <div class="list" id="ptList"></div>
       <button class="secondary" id="copyStats" style="width:100%" data-i18n="copyStats">Copy playtest data</button>
@@ -427,6 +557,7 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
         <div class="li hidden" id="oChRow"><span id="oChLbl"></span><b id="oCh"></b></div>
         <div class="li hidden" id="oDailyRow"><span id="oDailyLbl">Today's best</span><b id="oDaily">0 m</b></div>
       </div>
+      <div class="opass" id="oPass"><span class="lvl"><small data-i18n="lv">LV</small><b id="oPassLv">1</b></span><span class="row-text"><b id="oPassXp"></b><span class="xpbar"><i id="oPassBar"></i></span><small id="oPassNext"></small></span></div>
       <div id="oMissions" class="mlist"></div>
       <button class="primary" id="againBtn" data-i18n="rideAgain">Ride again</button>
       <button class="primary blue" id="chBtn" data-i18n="sendChallenge">Challenge a friend</button>
@@ -456,6 +587,7 @@ input.text{font:inherit;color:var(--text);background:var(--surface3);border:0;bo
 </div>
 
 <script src="i18n.js"></script>
+<script src="lb-config.js"></script>
 <script>
 (() => {
 'use strict';
@@ -577,13 +709,103 @@ function makeMission(seq){
   return { type, n, reward: Math.round(r0 * (1 + tier * 0.5)), start: 0, done: false };
 }
 
+/* ================= Commuter pass ================= */
+// every metre is 1 XP, every clutch save 15 XP; levels get a little longer each time and never run out
+const xpNeed = L => 200 + 100 * L;
+function passInfo(xp){ let L = 1, x = xp; while (x >= xpNeed(L) && L < 999) { x -= xpNeed(L); L++; } return { L, into: x, need: xpNeed(L) }; }
+const PASS_UNLOCK = { 3: { line: 'central' }, 5: { char: 'desai' }, 7: { line: 'harbour' }, 10: { char: 'sunita' }, 15: { char: 'ganesh' } };
+const LINE_LV = { western: 1, central: 3, harbour: 7 };
+const lineOpen = k => save.passLv >= LINE_LV[k] || (save.lineOpen || []).includes(k);
+const passReward = L => Object.assign({ coins: 30 + 10 * L }, PASS_UNLOCK[L] || {});
+function rankName(L){ return T(L >= 50 ? 'rank6' : L >= 30 ? 'rank5' : L >= 15 ? 'rank4' : L >= 7 ? 'rank3' : L >= 3 ? 'rank2' : 'rank1'); }
+function rewardText(r){ return r.line ? T('line_' + r.line) : r.char ? (ct(r.char) || {}).name : T('coinsN', r.coins); }
+function nextBigReward(L){ for (let i = L + 1; i < L + 40; i++) if (PASS_UNLOCK[i]) return i; return 0; }
+function applyPassReward(L){
+  const r = passReward(L); save.coins += r.coins;
+  if (r.char && !save.owned.includes(r.char)) save.owned.push(r.char);
+  return r;
+}
+function grantXp(xp){ // returns the levels gained this ride
+  const before = save.passLv; save.xp += xp; const L = passInfo(save.xp).L, gained = [];
+  for (let l = before + 1; l <= L; l++) gained.push([l, applyPassReward(l)]);
+  save.passLv = Math.max(before, L); return gained;
+}
+function fillPass(lvEl, rankEl, barEl, nextEl){
+  const pi = passInfo(save.xp), nb = nextBigReward(pi.L);
+  lvEl.textContent = pi.L; if (rankEl) rankEl.textContent = rankName(pi.L);
+  barEl.style.width = Math.round(100 * pi.into / pi.need) + '%';
+  nextEl.textContent = T('passNext', pi.need - pi.into, pi.L + 1) + (nb ? ' \u00B7 ' + T('passUnlock', nb, rewardText(passReward(nb))) : '');
+}
+function renderPass(){
+  const l = $('passList'); l.innerHTML = ''; const cur = save.passLv;
+  for (let L = Math.max(2, cur - 2); L <= cur + 14; L++) {
+    const r = passReward(L), li = document.createElement('li'); li.className = (L <= cur ? 'got' : '') + (L === cur + 1 ? ' cur' : '');
+    li.innerHTML = '<span class="n"></span><span class="rw"><b></b><small></small></span><span class="st"></span>';
+    li.querySelector('.n').textContent = L;
+    li.querySelector('.rw b').textContent = (r.line || r.char) ? rewardText(r) : T('coinsN', r.coins);
+    li.querySelector('.rw small').textContent = (r.line || r.char) ? T('coinsN', r.coins) + ' \u00B7 ' + rankName(L) : rankName(L);
+    li.querySelector('.st').textContent = L <= cur ? '\u2713' : T('xpN', xpTo(L));
+    l.appendChild(li);
+  }
+}
+function xpTo(L){ let x = 0; for (let i = 1; i < L; i++) x += xpNeed(i); return Math.max(0, x - save.xp); }
+
+/* ================= Leaderboard (Supabase; see lb-config.js and store/leaderboard-setup.sql) ================= */
+const LB = window.MLS_LB || {};
+const lbOn = () => !!(LB.url && LB.key) && !SHOT;
+function newId(){ try { if (crypto.randomUUID) return crypto.randomUUID(); } catch(e){} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); }
+function lbFetchRaw(path, method, body, extra){
+  const h = Object.assign({ apikey: LB.key, Authorization: 'Bearer ' + LB.key, 'Content-Type': 'application/json' }, extra || {});
+  return fetch(LB.url.replace(/\/$/, '') + '/rest/v1/' + path, { method: method || 'GET', headers: h, body: body ? JSON.stringify(body) : undefined })
+    .then(r => { if (!r.ok) throw new Error('lb ' + r.status); return r; });
+}
+function lbSubmit(){
+  if (!lbOn() || !save.name) return;
+  lbFetchRaw('rpc/submit_score', 'POST', { p_id: save.pid, p_name: save.name, p_best: save.best, p_total: save.totals.dist, p_level: save.passLv }).catch(() => {});
+}
+async function lbLoad(board){
+  const col = board === 'total' ? 'total' : 'best', mine = board === 'total' ? save.totals.dist : save.best;
+  const rows = await (await lbFetchRaw('scores?select=name,best,total,level&order=' + col + '.desc&limit=50')).json();
+  const c = await lbFetchRaw('scores?select=best&' + col + '=gt.' + mine, 'HEAD', null, { Prefer: 'count=exact' });
+  return { rows, rank: 1 + (parseInt((c.headers.get('content-range') || '*/0').split('/')[1], 10) || 0) };
+}
+let lbBoard = 'best';
+function lbDemo(board){ // sample rows for screenshots and when offline
+  const n = [['Priya', 2310, 41250, 24], ['Arjun', 1980, 38800, 22], ['Meera', 1640, 29120, 18], ['Kabir', 1210, 25400, 16], ['Sana', 990, 17330, 12]];
+  const me = [save.name || T('you'), save.best, save.totals.dist, save.passLv, 1];
+  const all = n.concat([me]).sort((a, b) => board === 'total' ? b[2] - a[2] : b[1] - a[1]);
+  return { rows: all.map(r => ({ name: r[0], best: r[1], total: r[2], level: r[3], me: r[4] })), rank: all.indexOf(me) + 1 };
+}
+function renderLb(){
+  document.querySelectorAll('#lbSeg button').forEach(b => b.classList.toggle('on', b.dataset.b === lbBoard));
+  const needName = !save.name && !SHOT; $('lbName').classList.toggle('hidden', !needName);
+  $('lbNameIn').placeholder = T('lbNamePh');
+  const list = $('lbList'), hint = $('lbHint'); list.innerHTML = '';
+  const draw = ({ rows, rank }) => {
+    list.innerHTML = '';
+    rows.slice(0, 50).forEach((r, i) => {
+      const li = document.createElement('li'); const me = r.me || (save.name && r.name === save.name && (lbBoard === 'total' ? r.total === save.totals.dist : r.best === save.best));
+      li.className = (i === 0 ? 'first' : '') + (me ? ' me' : '');
+      li.innerHTML = '<span class="rk"></span><span class="rm"><b></b></span><span class="rd"></span>';
+      li.querySelector('.rk').textContent = i + 1; li.querySelector('.rm b').textContent = r.name;
+      const lv = document.createElement('span'); lv.className = 'lvs'; lv.textContent = T('lv') + ' ' + r.level; li.querySelector('.rm b').appendChild(lv);
+      li.querySelector('.rd').textContent = (lbBoard === 'total' ? r.total : r.best) + ' m';
+      list.appendChild(li);
+    });
+    hint.textContent = save.name ? T('lbYou', rank) : '';
+  };
+  if (!lbOn()) { draw(lbDemo(lbBoard)); if (!SHOT) hint.textContent = T('lbLocal'); return; }
+  hint.textContent = T('lbLoading');
+  lbLoad(lbBoard).then(draw).catch(() => { draw(lbDemo(lbBoard)); hint.textContent = T('lbOffline'); });
+}
+
 /* ================= Save data ================= */
 const SAVE_KEY = 'mls_save_v2';
 const DEFAULT_SAVE = { best: 0, coins: 0, owned: ['rahul'], char: 'rahul',
   settings: { sfx: true, music: true, vib: true, shake: true, hq: true, lang: '', voice: true, easy: false },
   tutorialDone: false, missions: [], missionSeq: 0, totals: { dist: 0, runs: 0 },
   daily: { date: '', best: 0, rewarded: false, streak: 0 }, records: [],
-  line: 'western', stand: 'middle', acc: '', accOwned: [], name: '',
+  line: 'western', stand: 'middle', acc: '', accOwned: [], name: '', xp: -1, passLv: 0, pid: '',
   stats: { rides: 0, firstRide: 0, secs: 0, saves: 0, skips: 0, quits: 0, recent: [] } };
 function normalize(s){
   const d = JSON.parse(JSON.stringify(DEFAULT_SAVE));
@@ -605,6 +827,9 @@ function normalize(s){
   d.records = d.records.filter(r => r && typeof r.d === 'number').slice(0, 10);
   d.missions = d.missions.filter(m => m && MT[m.type]);
   d.best = Math.max(0, d.best | 0); d.coins = Math.max(0, d.coins | 0);
+  if (typeof d.xp !== 'number' || d.xp < 0) { d.xp = Math.max(0, d.totals.dist | 0); d.passLv = passInfo(d.xp).L; } // older saves: past distance counts as XP, no back-pay
+  if (!d.passLv) d.passLv = passInfo(d.xp).L;
+  if (!/^[0-9a-f-]{36}$/.test(d.pid)) d.pid = newId();
   return d;
 }
 function loadLocal(){
@@ -789,9 +1014,10 @@ function syncTouches(e){
   const live = new Set(); for (const t of e.touches) live.add(t.identifier);
   for (const id of touches.keys()) if (!live.has(id)) touches.delete(id);
 }
-function onTouchStart(e){ e.preventDefault(); ensureAudio(); if (S.state === 'replay') { endReplay(); return; } for (const t of e.changedTouches) touches.set(t.identifier, sideOf(t.clientX)); syncTouches(e); }
+function onTouchStart(e){ e.preventDefault(); ensureAudio(); if (S.state === 'replay') { endReplay(); return; } for (const t of e.changedTouches) { touches.set(t.identifier, sideOf(t.clientX)); touchT0.set(t.identifier, performance.now()); } syncTouches(e); }
 function onTouchMove(e){ e.preventDefault(); for (const t of e.changedTouches) if (touches.has(t.identifier)) touches.set(t.identifier, sideOf(t.clientX)); }
-function onTouchEnd(e){ e.preventDefault(); for (const t of e.changedTouches) touches.delete(t.identifier); syncTouches(e); }
+const touchT0 = new Map();
+function onTouchEnd(e){ e.preventDefault(); for (const t of e.changedTouches) { touches.delete(t.identifier); const t0 = touchT0.get(t.identifier); touchT0.delete(t.identifier); if (t0 && performance.now() - t0 < 220 && S.state === 'tutorial') S.tapWarn = 2.2; } syncTouches(e); }
 cv.addEventListener('touchstart', onTouchStart, { passive: false });
 cv.addEventListener('touchmove', onTouchMove, { passive: false });
 cv.addEventListener('touchend', onTouchEnd, { passive: false });
@@ -991,13 +1217,13 @@ function reset(){
     grip: 100, exhausted: false, runCoins: 0, coinAcc: 0, steadyT: 0, nearArmed: false,
     jerks: 0, nears: 0, steadies: 0, chaiOk: 0, tunnels: 0,
     event: null, eventT: 0, eventTimer: curMod() && curMod().events ? grand(6, 9) : grand(16, 22), chaiSpilled: false, banner: null, grace: 0,
-    continued: false, dailyDone: false, bankedDist: 0, bankedCoins: 0, runCounted: false, tutStep: 0, tutT: 0, previewChar: null, doneThisRun: [],
+    xpGiven: 0, continued: false, dailyDone: false, bankedDist: 0, bankedCoins: 0, runCounted: false, tutStep: 0, tutT: 0, previewChar: null, doneThisRun: [],
     nextJerkDir: gchance(0.5) ? -1 : 1, nextJerkMag: grand(38, 75), cued: false, cueK: 0, combo: 0, lastSaveT: -99, bestCombo: 0, danger: 0,
     freeze: 0, reliefT: 0, cheerT: 0, glare: null, glareT: 0, bubbles: [], offer: null, seatT: 0, calmT: 0, chaiT: 0, shield: false,
     rec: [], pendingSave: null, bestSave: null, trace: [], gaspArmed: true, shoutT: 0, replay: null, rideSecs: 0 });
   particles.length = 0; popups.length = 0;
 }
-function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records']) $(id).classList.add('hidden'); syncSheetOpen(); }
+function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records', 'pass']) $(id).classList.add('hidden'); syncSheetOpen(); }
 const anyPanelOpen = () => ['chars', 'missions', 'settings', 'records'].some(id => !$(id).classList.contains('hidden'));
 function startGame(mode){
   mode = mode === 'daily' || mode === 'challenge' ? mode : 'normal';
@@ -1139,6 +1365,7 @@ const TUT = [
   { text: 'tut4_t', sub: 'tut4_s', force: 0, need: 'time' }
 ];
 function tutorialUpdate(dt){
+  if (S.tapWarn > 0) S.tapWarn -= dt;
   const st = TUT[S.tutStep]; if (!st) return;
   let ok = false;
   // count time spent holding the correct side (tilt is clamped, so the player can't fall here)
@@ -1192,6 +1419,8 @@ function showOver(){
   }
   if (S.mode === 'daily') save.daily.best = Math.max(save.daily.best, Math.floor(S.dist));
   bankRun();
+  const totXp = Math.floor(S.dist) + 15 * S.nears + (S.mode === 'daily' ? 100 : 0), runXp = Math.max(0, totXp - S.xpGiven); S.xpGiven = Math.max(S.xpGiven, totXp); // safe after a second chance
+  const gained = grantXp(runXp);
   save.records = save.records.filter(r => r.id !== S.runId);
   save.records.push({ id: S.runId, d: Math.floor(S.dist), lv: S.level, c: save.char, t: dayKey(), m: S.mode, ln: S.line, e: !!save.settings.easy });
   logRide();
@@ -1210,6 +1439,9 @@ function showOver(){
   $('oChRow').classList.toggle('hidden', S.mode !== 'challenge');
   if (S.mode === 'challenge') { const diff = d - S.challenge.d, who = S.challenge.n || T('aFriend'); $('oChLbl').textContent = diff > 0 ? T('chWin', who, diff) : T('chLose', who, -diff); $('oCh').textContent = S.challenge.d + ' m'; }
   countUp($('oDist'), d, ' m'); countUp($('oCoins'), S.runCoins, '');
+  $('oPassXp').textContent = T('xpGain', S.xpGiven); fillPass($('oPassLv'), null, $('oPassBar'), $('oPassNext'));
+  if (gained.length) { const [l, r] = gained[gained.length - 1]; setTimeout(() => { banner(T('levelUp', l), (r.line || r.char) ? T('unlockedX', rewardText(r)) : T('coinsN', r.coins), '#ffd60a'); sfxMission(); vib([30, 40, 30]); celebrate(); }, 500); }
+  lbSubmit();
   if (nb) celebrate();
   const om = $('oMissions'); om.innerHTML = '';
   for (const m of S.doneThisRun) om.appendChild(missionEl(m));
@@ -1343,7 +1575,7 @@ function update(dt){
   if (S.seatT > 0) { S.tilt *= Math.max(0, 1 - dt * 6); S.tiltVel *= Math.max(0, 1 - dt * 8); } // sitting: nothing to balance
   if (S.state === 'menu') S.tilt = clamp(S.tilt, -30, 30);
   if (S.clutchDemo) S.tilt = clamp(S.tilt, -44.4, 44.4);
-  if (tut) { S.tilt = clamp(S.tilt, -42, 42); if (Math.abs(S.tilt) >= 42) S.tiltVel = 0; tutorialUpdate(dt); }
+  if (tut) { S.tilt = clamp(S.tilt, -34, 34); if (Math.abs(S.tilt) >= 34) S.tiltVel = 0; tutorialUpdate(dt); } // a clear lean, without the body leaving the screen
   updateStrap(dt, false);
   updateHangers(dt);
 
@@ -2580,6 +2812,34 @@ function drawTouchHints(){
     ctx.globalAlpha = 1;
   }
 }
+// animated hand: moves in, presses and HOLDS; a ring fills while the finger stays down
+function drawHand(x, y, k){ // ink-outlined pointing hand, fingertip at (x, y)
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(-0.12);
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.ellipse(-17, 40, 7, 13, -0.7, 0, TAU); ctx.fill(); ctx.stroke(); // thumb
+  rr(ctx, -16, 26, 36, 34, 12); ctx.fill(); ctx.shadowColor = 'transparent'; ctx.stroke(); // palm
+  for (const [fx, fh] of [[0, 0], [9, 4], [17, 8]]) { if (!fx) continue; rr(ctx, fx - 2, 22 + fh, 10, 14, 5); ctx.fill(); ctx.stroke(); } // folded fingers
+  rr(ctx, -8, 0, 14, 36, 7); ctx.fill(); ctx.stroke(); // index finger
+  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-5, 7); ctx.quadraticCurveTo(-1, 4, 3, 7); ctx.stroke(); // nail
+  ctx.restore();
+}
+function drawHandCoach(hx, hy, prog, holding){
+  const cyc = (S.t % 2.4) / 2.4, press = holding ? 1 : clamp((cyc - 0.25) / 0.12, 0, 1) * (cyc < 0.92 ? 1 : 0);
+  const fy = hy + 46 - press * 14, r = 34 * G.u + 14;
+  ctx.save();
+  ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(hx, hy, r, 0, TAU); ctx.stroke();
+  const ringP = holding ? prog : press ? clamp((cyc - 0.37) / 0.5, 0, 1) : 0;
+  ctx.strokeStyle = '#ffd60a'; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(hx, hy, r, -Math.PI / 2, -Math.PI / 2 + TAU * ringP); ctx.stroke();
+  if (press) { ctx.fillStyle = `rgba(255,214,10,${0.25 * press})`; ctx.beginPath(); ctx.arc(hx, hy, r * (0.55 + 0.1 * Math.sin(S.t * 8)), 0, TAU); ctx.fill(); }
+  drawHand(hx + 4, fy - 4, 0.9 * G.u + 0.45);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(11 * G.u + 7)}px ${FONT}`; ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,.7)'; ctx.shadowBlur = 12; ctx.fillText(T('hold'), hx, hy - r - 18); ctx.shadowBlur = 0;
+  ctx.font = `600 ${Math.round(7 * G.u + 6)}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillText(T('holdSub'), hx, hy - r - 2);
+  if (S.tapWarn > 0) { ctx.globalAlpha = clamp(S.tapWarn, 0, 1); ctx.fillStyle = '#ff453a'; rr(ctx, W / 2 - 120, H * 0.42, 240, 40, 20); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(8 * G.u + 8)}px ${FONT}`; ctx.fillText(T('noTap'), W / 2, H * 0.42 + 20); ctx.globalAlpha = 1; }
+  ctx.restore();
+}
 function drawTutorial(){
   if (S.state !== 'tutorial') return;
   const st = TUT[S.tutStep]; if (!st) return;
@@ -2597,10 +2857,7 @@ function drawTutorial(){
     g.addColorStop(0, `rgba(255,214,10,${0.12 + 0.16 * pulse})`); g.addColorStop(1, 'rgba(255,214,10,0)');
     ctx.fillStyle = g; ctx.fillRect(left ? 0 : W / 2, 0, W / 2, H);
     const hx = left ? W * 0.2 : W * 0.8, hy = H * 0.6;
-    ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(11 * G.u + 6)}px ${FONT}`;
-    ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 12; ctx.fillText(T('hold'), hx, hy - 38); ctx.shadowBlur = 0;
-    ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.arc(hx, hy + 4 * pulse, 16 + 4 * pulse, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.strokeStyle = 'rgba(255,214,10,.9)'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(hx, hy + 4 * pulse, 28 + 10 * pulse, 0, TAU); ctx.stroke();
+    drawHandCoach(hx, hy, clamp(S.tutT / needT, 0, 1), (left ? isLeft() : isRight()));
   }
 }
 function render(){
@@ -2640,15 +2897,18 @@ function missionEl(m){
   return d;
 }
 function renderPickers(){
+  if (!lineOpen(save.line)) save.line = 'western';
+  fillPass($('passLv'), $('passRank'), $('passBar'), $('passNext'));
   const ls = $('lineSeg'); ls.innerHTML = '';
   for (const k of LINE_ORDER) {
-    const b = document.createElement('button'); b.textContent = T('line_' + k); b.classList.toggle('on', save.line === k);
-    b.addEventListener('click', () => { ensureAudio(); sfxTap(); save.line = k; persist(); refreshMenus(); });
+    const b = document.createElement('button'), open = lineOpen(k); b.textContent = open ? T('line_' + k) : '\uD83D\uDD12 ' + T('lv') + ' ' + LINE_LV[k]; b.classList.toggle('on', save.line === k); b.classList.toggle('lockd', !open);
+    b.addEventListener('click', () => { ensureAudio(); sfxTap(); if (!open) { toast(T('lineLocked', T('line_' + k), LINE_LV[k])); return; } save.line = k; persist(); refreshMenus(); });
     ls.appendChild(b);
   }
   document.querySelectorAll('#standSeg button').forEach(b => { b.classList.toggle('on', save.stand === b.dataset.v); });
 }
 function renderRecords(){
+  renderLb();
   const st = $('recStats'); st.innerHTML = '';
   const tiles = [[T('best'), save.best + ' m'], [T('totalDist'), save.totals.dist + ' m'], [T('rides'), save.totals.runs], [T('dayStreak'), save.daily.streak]];
   for (const [k, v] of tiles) { const d = document.createElement('div'); d.innerHTML = '<small></small><b></b>'; d.querySelector('small').textContent = k; d.querySelector('b').textContent = v; st.appendChild(d); }
@@ -2963,6 +3223,10 @@ const on = (id, fn) => $(id).addEventListener('click', e => { ensureAudio(); sfx
 on('heroCard', () => startGame('normal'));
 on('dailyBtn', () => startGame('daily'));
 on('recordsBtn', () => { renderRecords(); openPanel('records'); });
+on('passBtn', () => { ensureAudio(); sfxTap(); renderPass(); openPanel('pass'); });
+on('passClose', () => closePanel('pass'));
+document.querySelectorAll('#lbSeg button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); lbBoard = b.dataset.b; renderLb(); }));
+on('lbNameSave', () => { const v = $('lbNameIn').value.replace(/[^\p{L}\p{N} ._-]/gu, '').trim().slice(0, 16); if (!v) { toast(T('lbNamePh')); return; } save.name = v; persist(); lbSubmit(); renderLb(); });
 on('recordsClose', () => closePanel('records'));
 on('againBtn', () => { if (performance.now() - overShownAt > 600) startGame(S.mode); });
 on('contBtn', () => continueRun(false));
@@ -3049,7 +3313,8 @@ function runShot(){ // deterministic states for store screenshots (waits for the
   if (SHOT === 'replay') { S.autopilot = true; S.clutchDemo = true; startGame(); S.dist = 120; setTimeout(() => { S.clutchDemo = false; S.autopilot = false; }, 9000); }
   if (SHOT === 'seat') { S.autopilot = true; startGame(); S.dist = 120; setTimeout(() => takeItem('seat'), 1200); }
   if (SHOT === 'settings') { renderSettings(); openPanel('settings'); }
-  if (SHOT === 'records') { save.records = [{ id: 1, d: 1240, lv: 4, c: 'desai', t: dayKey(), m: 'daily' }, { id: 2, d: 812, lv: 3, c: 'rahul', t: dayKey(), m: 'normal' }]; save.best = 1240; save.totals = { dist: 5320, runs: 14 }; save.daily.streak = 3; renderRecords(); openPanel('records'); }
+  if (SHOT === 'pass') { save.xp = 2350; save.passLv = passInfo(2350).L; renderPass(); openPanel('pass'); }
+  if (SHOT === 'records') { save.name = 'Sijo'; save.records = [{ id: 1, d: 1240, lv: 4, c: 'desai', t: dayKey(), m: 'daily' }, { id: 2, d: 812, lv: 3, c: 'rahul', t: dayKey(), m: 'normal' }]; save.best = 1240; save.totals = { dist: 5320, runs: 14 }; save.daily.streak = 3; renderRecords(); openPanel('records'); }
   if (SHOT === 'play' || SHOT === 'over' || SHOT === 'event' || SHOT === 'chai') { S.autopilot = true; startGame(); S.dist = SHOT === 'play' ? 238 : 0; }
   if (SHOT === 'over') setTimeout(() => { S.dist = 1240; S.level = 4; S.runCoins = 168; gameOver(); }, 400);
   if (SHOT === 'chars') { save.coins = 650; save.owned = ['rahul', 'desai']; S.previewChar = 'sunita'; $('charsBtn').click(); S.previewChar = 'sunita'; renderChars(); }
