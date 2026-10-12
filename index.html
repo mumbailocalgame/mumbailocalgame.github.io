@@ -493,6 +493,12 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
 .upg{margin-top:6px;width:100%}
 .grpbox{margin:8px 0}
 #lbSeg button{white-space:normal;font-size:12px;padding:6px 4px;min-height:44px}
+.tab{position:relative}.tabdot{position:absolute;top:2px;right:18px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid #fff}
+.drop.isnew{background:#fff3df;box-shadow:0 0 0 2px var(--accent),0 3px 0 rgba(0,0,0,.08)}
+.newpill{flex:none;background:var(--purple);color:#fff;font-size:11px;letter-spacing:.08em;padding:4px 8px;border-radius:999px;box-shadow:0 2px 0 var(--purple-sh)}
+.badge.newb{background:var(--purple);box-shadow:0 2px 0 var(--purple-sh);font-size:10px;letter-spacing:.06em}
+#progList .row.lockd{opacity:.55}
+#progList .row{min-height:64px}
 /* boot screen: shown until the illustrated art is ready, so the old placeholder figures never flash */
 .boot{background:var(--bg);align-items:center;justify-content:center;z-index:40;transition:opacity .35s}
 .boot.out{opacity:0;pointer-events:none}
@@ -546,7 +552,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></span>
         <span class="row-text"><b id="rivalT"></b><small id="rivalS"></small></span>
       </button>
-      <div class="pickers">
+      <div class="pickers" id="pickers">
         <small class="plabel" data-i18n="pickLine">Line</small>
         <div class="seg" id="lineSeg"></div>
         <small class="plabel" data-i18n="pickStand">Where you stand</small>
@@ -563,8 +569,8 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <svg class="chev" viewBox="0 0 9 15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l6 6-6 6"/></svg>
       </button>
 
-      <div class="shelf-head"><h3 data-i18n="commuters">Commuters</h3><button class="link" id="charsBtn" data-i18n="seeAll">See all</button></div>
-      <div class="shelf" id="shelf"></div>
+      <div class="shelf-head hidden"><h3 data-i18n="commuters">Commuters</h3><button class="link" id="charsBtn" data-i18n="seeAll">See all</button></div>
+      <div class="shelf hidden" id="shelf"></div>
 
       <button class="row" id="storyBtn">
         <img class="row-thumb" id="storyThumb" alt="">
@@ -581,6 +587,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
     <nav class="tabbar">
       <button class="tab on" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round"><path d="M3.5 10.5L12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5z"/></svg><span data-i18n="home">Home</span></button>
       <button class="tab" id="shopBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span data-i18n="shop">Shop</span></button>
+      <button class="tab" id="progressBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span data-i18n="progress">Progress</span><i class="tabdot hidden" id="progDot"></i></button>
       <button class="tab" id="recordsBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 4v12"/><circle cx="17" cy="17.5" r="2.5"/></svg><span data-i18n="records">Records</span></button>
       <button class="tab" id="settingsBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="settings">Settings</span></button>
     </nav>
@@ -619,10 +626,18 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.6.0</p>
+      <p class="ver">Mumbai Local Straphanger 1.7.0</p>
     </div>
   </div>
 
+  <!-- PROGRESS: everything long-term in one place, so home stays calm -->
+  <div id="progress" class="overlay sheet-wrap hidden">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 data-i18n="progress">Progress</h2><button class="done" id="progressClose" data-i18n="done">Done</button></div>
+      <div id="progList"></div>
+    </div>
+  </div>
   <!-- LOGIN CALENDAR -->
   <div id="cal" class="overlay sheet-wrap hidden">
     <div class="sheet">
@@ -766,7 +781,8 @@ function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.a
 const cap = name => (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins[name]) || null;
 const isNative = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const GAME_URL = 'https://mumbailocalgame.github.io/';
-const SHOT = new URLSearchParams(location.search).get('shot'); // screenshot mode for store images
+const SHOT = new URLSearchParams(location.search).get('shot');
+const HOLD_TILT = SHOT && new URLSearchParams(location.search).get('tilt') ? +new URLSearchParams(location.search).get('tilt') : null; // screenshot mode for store images
 
 /* ================= Data ================= */
 const STATIONS = ['Churchgate','Mumbai Central','Dadar','Bandra','Andheri','Borivali','Bhayandar','Vasai Road','Virar'];
@@ -1303,6 +1319,12 @@ function sfxClack(v){ if (!canPlay()) return; const t = AC.currentTime + 0.01;
   for (const k of [0, 0.11]) { noise(t + k, 0.06, 0.32 * v, 'bandpass', 2300, 0, 1.4); tone('triangle', 150, 55, t + k, 0.38 * v, 0.004, 0.08); } }
 function sfxWarn(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // heartbeat at the edge
   tone('sine', 64, 44, t, 0.75, 0.008, 0.16); tone('sine', 58, 40, t + 0.17, 0.5, 0.008, 0.2); }
+function sfxSwitch(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // points switch: heavy 'ta-dak'
+  for (const k of [0, 0.09]) { noise(t + k, 0.06, 0.34, 'bandpass', 2600, 0, 2.2); tone('triangle', 520, 300, t + k, 0.1, 0.004, 0.1); tone('sine', 90, 50, t + k, 0.3, 0.004, 0.12); } }
+function sfxSqueal(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // steel wheels on a tight curve
+  tone('sine', 3150, 2900, t, 0.018, 0.25, 1.4); tone('sine', 4720, 4400, t + 0.1, 0.01, 0.3, 1.2); noise(t, 1.3, 0.05, 'bandpass', 3600, 0, 6); }
+function sfxBrake(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // air brakes before the platform
+  noise(t, 0.9, 0.16, 'highpass', 2400, 0); tone('sine', 1800, 1400, t + 0.15, 0.012, 0.2, 0.7); }
 function sfxCue(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // rail joint 'tick' before a jerk
   noise(t, 0.05, 0.25, 'bandpass', 3400, 0, 3); tone('triangle', 900, 620, t, 0.07, 0.004, 0.09); }
 function sfxGasp(){ if (!canPlay()) return; const t = AC.currentTime + 0.01; // the crowd draws breath at the edge
@@ -1417,7 +1439,7 @@ function reset(){
     rec: [], pendingSave: null, bestSave: null, trace: [], gaspArmed: true, shoutT: 0, replay: null, rideSecs: 0 });
   particles.length = 0; popups.length = 0;
 }
-function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records', 'pass', 'cal', 'story']) $(id).classList.add('hidden'); syncSheetOpen(); }
+function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records', 'pass', 'cal', 'story', 'progress']) $(id).classList.add('hidden'); syncSheetOpen(); }
 const anyPanelOpen = () => ['chars', 'missions', 'settings', 'records'].some(id => !$(id).classList.contains('hidden'));
 function startGame(mode){
   mode = mode === 'daily' || mode === 'challenge' ? mode : 'normal';
@@ -1513,7 +1535,7 @@ function jerk(dir, mag, fx, quiet){
   vib(mag > 70 ? [35, 25, 45] : mag > 40 ? [28] : [14]); // the bigger the jerk, the heavier the buzz
   S.speedLines = [];
   for (let i = 0; i < 10; i++) S.speedLines.push({ y: rand(H * 0.16, H * 0.82), len: rand(0.25, 0.6), w: rand(1.5, 4) });
-  if (!quiet) popup(JERK_WORDS[Math.random() * JERK_WORDS.length | 0], '#ffd23f', 36, H * 0.5);
+  if (!quiet) popup(mag > 62 * 1.2 ? T('pointsHit') : JERK_WORDS[Math.random() * JERK_WORDS.length | 0], mag > 62 * 1.2 ? '#ff8c1e' : '#ffd23f', 36, H * 0.5);
   const sx = dir > 0 ? 6 : W - 6;
   spawn(sx, G.floorY - H * 0.02, 16, { dir: dir > 0 ? -0.5 : Math.PI + 0.5, spread: 0.6, v0: 160, v1: 420, colors: ['#ffd23f', '#ff8a1c', '#fff3b0'] });
   sfxThump(); vib(25);
@@ -1547,11 +1569,15 @@ const ABIL = {
   sunita: { dur: 5,   cd: 20 }, // Iron grip: grip does not drain
   ganesh: { dur: 3.5, cd: 18 }  // Quick hands: steer 60% harder
 };
+// features arrive one at a time as the player settles in (counted in finished rides), so the first minute is just: hold on.
+const UNLOCK = { missions: 1, abil: 2, pass: 3, rival: 4, story: 5, collect: 5 };
+const UNLOCK_ORDER = ['missions', 'abil', 'pass', 'rival', 'story', 'collect'];
+const unlocked = f => f === 'cal' ? save.totals.runs >= 1 && save.installDay !== dayKey() : save.totals.runs >= UNLOCK[f];
 const abilOn = k => S.abilT > 0 && heroKey() === k;
 const ABIL_COST = [300, 700];
 function abilStat(k){ const lv = save.abilLv[k] || 0; return { dur: ABIL[k].dur * (1 + 0.3 * lv), cd: Math.round(ABIL[k].cd * (1 - 0.15 * lv)), lv }; } // each upgrade: +30% duration, -15% cooldown
 function useAbility(){
-  if (S.state !== 'playing' || S.abilCd > 0) return;
+  if (S.state !== 'playing' || S.abilCd > 0 || !unlocked('abil')) return;
   const k = heroKey(), a = abilStat(k); S.abilCd = a.cd; S.abilT = a.dur;
   if (k === 'rahul') { S.grip = Math.min(100, S.grip + 50); S.tiltVel *= 0.3; S.exhausted = false; }
   banner(T('abil_' + k), T('abilDo_' + k), '#f39c12'); sfxMission(); vib([20, 30, 20]);
@@ -1560,7 +1586,7 @@ function useAbility(){
 }
 function syncAbil(){
   const b = $('abilBtn'); if (!b) return;
-  const show = S.state === 'playing'; b.classList.toggle('hidden', !show); if (!show) return;
+  const show = S.state === 'playing' && unlocked('abil'); b.classList.toggle('hidden', !show); if (!show) return;
   const k = heroKey(), a = abilStat(k), ready = S.abilCd <= 0;
   b.classList.toggle('ready', ready); b.classList.toggle('active', S.abilT > 0);
   b.style.setProperty('--p', ready ? 1 : 1 - S.abilCd / a.cd);
@@ -1677,12 +1703,15 @@ function unlockPostcard(i){ if (save.postcards.includes(i)) return null; save.po
 function rideDrops(){ // collectibles earned by this ride (visual only, never random-for-money)
   const out = [];
   if (S.mode !== 'challenge' && S.line === 'western') { const pc = unlockPostcard(0); if (pc) out.push(pc); }
-  if (S.playT > 15 && gchanceVisual(0.45)) {
+  if (S.playT > 15 && unlocked('collect') && gchanceVisual(0.45)) {
     const n = Math.random() * 30 | 0;
     if (save.stickers.includes(n)) { save.coins += 20; out.push({ img: 'art/sticker-' + n + '.webp', text: T('stickerDup') }); }
     else { save.stickers.push(n); out.push({ img: 'art/sticker-' + n + '.webp', text: T('newSticker', save.stickers.length) }); }
   }
-  if (save.story.day !== dayKey() && S.playT > 10 && save.story.n < 8) { save.story.day = dayKey(); save.story.n++; out.push({ img: 'art/story-' + (save.story.n - 1) + '.webp', text: T('newStory', save.story.n) }); }
+  if (unlocked('story') && save.story.day !== dayKey() && S.playT > 10 && save.story.n < 8) { save.story.day = dayKey(); save.story.n++; out.push({ img: 'art/story-' + (save.story.n - 1) + '.webp', text: T('newStory', save.story.n) }); }
+  for (const f of UNLOCK_ORDER) if (save.totals.runs === UNLOCK[f] && !(save.seenUnlock || []).includes(f)) {
+    (save.seenUnlock = save.seenUnlock || []).push(f); out.unshift({ img: '', text: T('unlock_' + f), isNew: true });
+  }
   persist(); return out;
 }
 const gchanceVisual = p => Math.random() < p; // not the seeded ride RNG: drops must not change challenge rides
@@ -1721,7 +1750,7 @@ function showOver(){
   // the "almost" line: how close the next station or your best was
   const into = S.dist - S.level * SEG, toNext = Math.ceil(SEG - into), gap = prevBest - d;
   $('nearMiss').textContent = gap > 0 && gap <= 60 ? T('nearBest', gap) : toNext <= 60 ? T('nearStation', toNext, stationName(S.level + 1)) : '';
-  $('oDrops').innerHTML = ''; for (const dr of drops) { const el = document.createElement('div'); el.className = 'drop'; el.innerHTML = '<img alt=""><span></span>'; el.querySelector('img').src = dr.img; el.querySelector('span').textContent = dr.text; $('oDrops').appendChild(el); }
+  $('oDrops').innerHTML = ''; for (const dr of drops) { const el = document.createElement('div'); el.className = 'drop' + (dr.isNew ? ' isnew' : ''); el.innerHTML = dr.img ? '<img alt=""><span></span>' : '<b class="newpill"></b><span></span>'; if (dr.img) el.querySelector('img').src = dr.img; else el.querySelector('b').textContent = T('newTag'); el.querySelector('span').textContent = dr.text; $('oDrops').appendChild(el); }
   $('oDist').textContent = d + ' m';
   $('oSt').textContent = stationName(S.level);
   $('oBest').textContent = save.best + ' m';
@@ -1818,23 +1847,23 @@ function update(dt){
   if (S.curveTimer <= 0) {
     S.curveTarget = tut || gchance(0.22) ? 0 : (gchance(0.5) ? -1 : 1) * grand(22, 52) * diff * LINES[S.line || 'western'].curveMul;
     S.curveTimer = grand(2, 4.5);
-    if (playing && Math.abs(S.curveTarget) > 38 * diff) popup(T(S.curveTarget > 0 ? 'curveR' : 'curveL'), '#7df9ff', 24, H * 0.47);
+    if (playing && Math.abs(S.curveTarget) > 38 * diff) { popup(T(S.curveTarget > 0 ? 'curveR' : 'curveL'), '#7df9ff', 24, H * 0.47); sfxSqueal(); }
   }
   S.curve += (S.curveTarget - S.curve) * Math.min(1, dt * 1.1);
   S.jerkTimer -= dt;
   if (S.jerkTimer <= 0) {
     S.jerkTimer = grand(1.5, 3.6) / Math.sqrt(diff);
     if (!tut && (!playing || (S.playT > 3.5 && S.grace <= 0))) jerk(S.nextJerkDir, S.nextJerkMag * Math.pow(diff, 0.8) * (playing ? LINES[S.line || 'western'].jerkMul : 1), playing);
-    S.nextJerkDir = gchance(0.5) ? -1 : 1; S.nextJerkMag = grand(38, 75); S.cued = false;
+    S.nextJerkDir = gchance(0.5) ? -1 : 1; S.nextJerkMag = grand(38, 75); S.nextJerkKind = S.nextJerkMag > 62 ? 'switch' : 'bump'; S.cued = false;
   }
   // telegraph: a yellow edge + rail 'tick' 0.6 s before every jerk, so a save is skill, not luck
   const canCue = playing && S.playT > 3.5 && S.grace <= 0;
   S.cueK = canCue && S.jerkTimer < 0.6 ? clamp((0.6 - S.jerkTimer) / 0.6, 0, 1) : 0;
-  if (S.cueK > 0 && !S.cued) { S.cued = true; sfxCue(); }
+  if (S.cueK > 0 && !S.cued) { S.cued = true; if (S.nextJerkKind === 'switch') sfxSwitch(); else sfxCue(); }
   if (S.pushTimer > 0) { S.pushTimer -= dt; if (S.pushTimer <= 0) S.pushTarget = 0; }
   S.push += (S.pushTarget - S.push) * Math.min(1, dt * 7);
   if (playing && S.dist - S.level * SEG > SEG - 30 && S.brakeDone !== S.level) {
-    S.brakeDone = S.level; startPush(1, grand(85, 120) * Math.pow(diff, 0.7), 0.9, T('brakes'));
+    S.brakeDone = S.level; startPush(1, grand(85, 120) * Math.pow(diff, 0.7), 0.9, T('brakes')); sfxBrake();
   }
   if (playing) updateEvent(dt, diff);
   updateWalkers(dt);
@@ -1873,6 +1902,7 @@ function update(dt){
   if (S.seatT > 0) { S.tilt *= Math.max(0, 1 - dt * 6); S.tiltVel *= Math.max(0, 1 - dt * 8); } // sitting: nothing to balance
   if (S.state === 'menu') S.tilt = clamp(S.tilt, -30, 30);
   if (S.clutchDemo) S.tilt = clamp(S.tilt, -44.4, 44.4);
+  if (HOLD_TILT !== null) { S.tilt = HOLD_TILT; S.tiltVel = 0; } // screenshot mode only
   if (tut) { S.tilt = clamp(S.tilt, -34, 34); if (Math.abs(S.tilt) >= 34) S.tiltVel = 0; tutorialUpdate(dt); } // a clear lean, without the body leaving the screen
   updateStrap(dt, false);
   updateHangers(dt);
@@ -2958,6 +2988,17 @@ function drawPlayerSprite(){
   G.px = S.hang && S.hang.x !== undefined ? S.hang.x : fx + (c.top[0] - c.foot[0]) * sc;
   ctx.save(); ctx.beginPath(); ctx.ellipse(fx + Math.sin(th) * 20, fy + 4, G.tw * 0.85, G.tw * 0.15, 0, 0, TAU); ctx.clip(); hatchRect(fx - G.tw * 1.3, fy - G.tw, G.tw * 2.8, G.tw * 2, 0.7); ctx.restore();
   const isSit = pk.endsWith('-sit');
+  if (!isSit && S.state === 'playing') { // danger glow behind the body (colour-blind palette when that setting is on)
+    const at = Math.abs(S.tilt), k = clamp((at - 18) / 22, 0, 1);
+    if (k > 0) {
+      const [cG, cY, cR] = save.settings.cbSafe ? ['#1e88e5', '#ffb300', '#d81b60'] : ['#30d158', '#ffd60a', '#ff453a'];
+      const col = at < 25 ? cG : at < 35 ? cY : cR, hh = sp.h * sc, cx = fx + Math.sin(th) * hh * 0.45, cy = fy - Math.cos(th) * hh * 0.45;
+      const pulse = at >= 35 ? 0.7 + 0.3 * Math.sin(S.t * 14) : 1, r = hh * 0.78, al = h => Math.round(h * k * pulse).toString(16).padStart(2, '0');
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(th); ctx.scale(0.62, 1); // a halo around the whole body, wider than it, so it shows past the outline
+      const g = ctx.createRadialGradient(0, 0, r * 0.35, 0, 0, r); g.addColorStop(0, col + al(200)); g.addColorStop(0.6, col + al(120)); g.addColorStop(1, col + '00');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill(); ctx.restore();
+    }
+  }
   if (isSit || mood === 'ko') {
     if (isSit) { const bh = sp.h * sc * 0.4; ctx.beginPath(); rr(ctx, fx - G.tw, fy - bh, G.tw * 2, G.tw * 0.26, 6); fillInk('#8a5a33', 1);
       ctx.beginPath(); rr(ctx, fx - G.tw * 0.9, fy - bh + G.tw * 0.26, G.tw * 0.14, bh - G.tw * 0.26, 3); fillInk('#5e3c22', 0.8);
@@ -3052,7 +3093,13 @@ function drawFx(){
     g.addColorStop(0, `rgba(255,214,10,${0.34 * k})`); g.addColorStop(1, 'rgba(255,214,10,0)');
     ctx.fillStyle = g; ctx.fillRect(d > 0 ? 0 : W - bw, 0, bw, H);
     ctx.strokeStyle = `rgba(255,214,10,${0.95 * k})`; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    for (let i = 0; i < 3; i++) { const x = x0 + d * (16 + i * 14 + (1 - k) * 10), y = H * 0.52; ctx.beginPath(); ctx.moveTo(x - d * 6, y - 12); ctx.lineTo(x + d * 4, y); ctx.lineTo(x - d * 6, y + 12); ctx.stroke(); }
+    const sw = S.nextJerkKind === 'switch', rowsY = sw ? [H * 0.47, H * 0.57] : [H * 0.52]; // points switch: two rows, orange
+    if (sw) ctx.strokeStyle = `rgba(255,140,30,${0.95 * k})`;
+    for (const y of rowsY) for (let i = 0; i < (sw ? 3 : 2); i++) { const x = x0 + d * (16 + i * 14 + (1 - k) * 10); ctx.beginPath(); ctx.moveTo(x - d * 6, y - 12); ctx.lineTo(x + d * 4, y); ctx.lineTo(x - d * 6, y + 12); ctx.stroke(); }
+    if (sw && k > 0.3) { // label chip: a points switch hits harder
+      ctx.font = `700 ${Math.round(6 * G.u + 8)}px ${FONT}`; const lbl = T('points'), tw = ctx.measureText(lbl).width + 18, bx = d > 0 ? 10 : W - 10 - tw, by = H * 0.4;
+      ctx.globalAlpha = Math.min(1, k * 1.5); ctx.fillStyle = '#ff8c1e'; ctx.beginPath(); rr(ctx, bx, by - 13, tw, 26, 13); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lbl, bx + tw / 2, by + 1); ctx.globalAlpha = 1; }
   }
   // popups: bold system type with a soft shadow
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -3238,7 +3285,40 @@ function missionEl(m){
   d.querySelector('span').textContent = MT[m.type].text(m.n) + (MT[m.type].ride || m.done ? '' : ` (${prog}/${m.n})`);
   return d;
 }
+// home shows PLAY, the line, and one card for today; the rest lives under Progress
+function renderToday(){
+  const rows = ['dailyBtn', 'rivalBtn', 'storyBtn', 'missionsBtn', 'passBtn']; let pick = null;
+  const playedToday = save.daily.date === dayKey();
+  if (save.totals.runs >= 1 && !playedToday) pick = 'dailyBtn';
+  else if (unlocked('story') && save.story.day !== dayKey() && save.story.n < 8) pick = 'storyBtn';
+  else if (unlocked('rival') && $('rivalT').textContent) pick = 'rivalBtn';
+  else if (unlocked('missions') && save.missions.some(m => !m.done)) pick = 'missionsBtn';
+  for (const r of rows) $(r).classList.toggle('hidden', r !== pick);
+  $('pickers').classList.toggle('hidden', save.totals.runs < 1); // first ride: nothing to choose yet
+  const dot = UNLOCK_ORDER.some(f => unlocked(f) && !(save.seenProgress || []).includes(f)); $('progDot').classList.toggle('hidden', !dot);
+}
+function renderProgress(){
+  const l = $('progList'); l.innerHTML = ''; const pi = passInfo(save.xp);
+  const items = [
+    ['pass', T('passTitle'), rankName(pi.L) + ' \u00B7 ' + T('lv') + ' ' + pi.L, () => { renderPass(); openPanel('pass'); }],
+    ['missions', T('missions'), $('missionSub').textContent, () => { renderMissions(); openPanel('missions'); }],
+    ['cal', T('calTitle'), save.cal.last === dayKey() ? T('calBack') : T('calReady'), () => { renderCal(); openPanel('cal'); }],
+    ['story', T('storyTitle'), save.story.n ? T('storyProg', save.story.n) : T('storyFirst'), () => { renderStory(); openPanel('story'); }],
+    ['collect', T('collection'), T('collectSub', save.postcards.length, save.stickers.length), () => { renderRecords(); openPanel('records'); setTimeout(() => $('pcGrid').scrollIntoView({ behavior: 'smooth' }), 250); }],
+    ['rival', T('lbWeek'), $('rivalT').textContent || T('rivalSoon'), () => { lbBoard = 'week'; renderRecords(); openPanel('records'); }]
+  ];
+  for (const [f, title, sub, open] of items) {
+    const ok = unlocked(f), b = document.createElement('button'); b.className = 'row' + (ok ? '' : ' lockd');
+    const fresh = ok && !(save.seenProgress || []).includes(f);
+    b.innerHTML = '<span class="row-text"><b></b><small></small></span>' + (fresh ? '<span class="badge newb"></span>' : '') + '<svg class="chev" viewBox="0 0 9 15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l6 6-6 6"/></svg>';
+    b.querySelector('b').textContent = title; b.querySelector('small').textContent = ok ? sub : (f === 'cal' ? T('unlockTomorrow') : T('unlockAfter', UNLOCK[f]));
+    if (fresh) b.querySelector('.newb').textContent = T('newTag');
+    b.addEventListener('click', () => { ensureAudio(); sfxTap(); if (!ok) { vib(10); return; } (save.seenProgress = save.seenProgress || []).push(f); persist(); closePanel('progress'); open(); renderToday(); });
+    l.appendChild(b);
+  }
+}
 function renderHomeExtras(){
+  renderToday();
   $('storyThumb').src = 'art/story-' + Math.max(0, save.story.n - 1) + '.webp';
   $('storySub').textContent = save.story.n ? T('storyProg', save.story.n) : T('storyFirst');
 }
@@ -3285,7 +3365,7 @@ async function refreshRival(){
   const mine = save.week.k === weekKey() ? save.week.best : 0; let rv = null;
   if (lbOn()) { try { const { rows } = await lbLoad('week'); const above = rows.filter(r => r.best > mine && r.name !== save.name); if (above.length) rv = { n: above[above.length - 1].name, d: above[above.length - 1].best }; } catch(e){} }
   if (!rv) rv = { n: T('practiceRival'), d: Math.max(150, Math.round((mine + 60) / 10) * 10), bot: true };
-  $('rivalBtn').classList.remove('hidden'); $('rivalT').textContent = T('rivalT', rv.n); $('rivalS').textContent = T('rivalS', Math.max(1, rv.d - mine));
+  $('rivalT').textContent = T('rivalT', rv.n); renderToday(); $('rivalS').textContent = T('rivalS', Math.max(1, rv.d - mine));
 }
 function renderRecords(){
   renderLb(); renderCollection();
@@ -3651,6 +3731,8 @@ on('recordsBtn', () => { renderRecords(); openPanel('records'); });
 $('abilBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); ensureAudio(); useAbility(); });
 on('passBtn', () => { ensureAudio(); sfxTap(); renderPass(); openPanel('pass'); });
 on('passClose', () => closePanel('pass'));
+on('progressBtn', () => { ensureAudio(); sfxTap(); renderProgress(); closePanel('start'); openPanel('progress'); });
+on('progressClose', () => { closePanel('progress'); openPanel('start'); refreshMenus(); });
 on('calClose', () => closePanel('cal')); on('calClaim', () => { ensureAudio(); claimCal(); });
 on('storyBtn', () => { ensureAudio(); sfxTap(); renderStory(); openPanel('story'); }); on('storyClose', () => closePanel('story'));
 on('rivalBtn', () => { ensureAudio(); sfxTap(); lbBoard = 'week'; renderRecords(); openPanel('records'); });
@@ -3735,11 +3817,18 @@ if (window.ResizeObserver) new ResizeObserver(layout).observe(game);
 S.challenge = readChallenge();
 layout(); applyI18n(); applyA11y(); scheduleReminders(); tickLed();
 { const g = new URLSearchParams(location.search).get('g'); if (g && /^[A-Z2-9]{6}$/.test(g)) { joinGroup(g); setTimeout(() => toast(T('grpJoined', g)), 1200); } }
-if (!SHOT) { refreshRival(); if (save.cal.last !== dayKey() && save.tutorialDone) setTimeout(() => { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } }, 900); }
+if (!SHOT) {
+  if (unlocked('rival')) refreshRival();
+  if (!save.tutorialDone && !readChallenge()) { const t0 = Date.now(); (function go(){ if (sprReady || artGaveUp || Date.now() - t0 > 9000) startGame(); else setTimeout(go, 60); })(); }
+  else if (save.cal.last !== dayKey() && unlocked('cal')) setTimeout(() => { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } }, 900);
+}
 function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
   save.tutorialDone = true;
   const sc = new URLSearchParams(location.search).get('c'); if (CHARS[sc]) { save.char = sc; save.owned = CHAR_ORDER.slice(); }
   const qp = new URLSearchParams(location.search), ln = qp.get('line'); if (LINES[ln]) { save.line = ln; save.passLv = 30; }
+  save.totals.runs = qp.get('runs') !== null ? +qp.get('runs') : Math.max(save.totals.runs, 12); if (save.totals.runs >= 12) save.installDay = '2026-01-01'; // screenshots show an experienced player unless runs= is given
+  if (SHOT === 'progress') { save.seenProgress = ['pass', 'missions']; renderProgress(); openPanel('progress'); }
+  refreshMenus();
   if (qp.get('cb')) save.settings.cbSafe = true;
   if (SHOT === 'card') { storyCard(1240, 'Andheri').then(c => { document.body.innerHTML = ''; c.style.cssText = 'width:100vw;height:auto;display:block'; document.body.style.cssText = 'overflow:auto;position:static;background:#000'; document.body.appendChild(c); }); return; }
   const sl = new URLSearchParams(location.search).get('lang'); if (LANGS.includes(sl)) { LANG = sl; applyI18n(); }
