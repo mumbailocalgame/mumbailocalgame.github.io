@@ -465,6 +465,34 @@ html,body{color:var(--text)}
 body.bigtext .overlay,body.bigtext #hud{zoom:1.12}
 body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!important;transition:none!important}
 #lineSeg{flex-wrap:wrap}#lineSeg button{flex:1 1 30%}
+.row-thumb{flex:none;width:56px;height:56px;border-radius:14px;object-fit:cover;background:var(--surface3)}
+.nearmiss{text-align:center;font-weight:700;color:var(--tabtxt);margin:2px 0 6px}
+.nearmiss:empty{display:none}
+.drops{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.drops:empty{display:none}
+.drop{display:flex;align-items:center;gap:12px;background:#fff8ec;border-radius:16px;padding:8px 12px;box-shadow:0 3px 0 rgba(0,0,0,.08);animation:rise .4s ease-out both}
+.drop img{width:52px;height:52px;object-fit:contain;border-radius:10px}
+.drop span{font-weight:700;font-size:14px}
+.calgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 16px}
+.calday{background:#fff;border-radius:16px;padding:10px 4px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.calday small{display:block;font-size:11px;font-weight:700;color:var(--text2)}.calday b{font-size:18px}
+.calday.got{background:var(--surface3);opacity:.6}.calday.cur{box-shadow:0 0 0 3px var(--accent),0 3px 0 rgba(0,0,0,.08)}
+.calday.big{grid-column:span 2;background:linear-gradient(180deg,#fff3df,#fff)}
+.storylist{display:flex;flex-direction:column;gap:14px}
+.storyp{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.storyp img{display:block;width:100%;aspect-ratio:1}.storyp p{padding:10px 14px;font-weight:600}
+.storyp.lockd img{filter:blur(14px) grayscale(.6)}.storyp.lockd p{color:var(--text2)}
+.pcgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.pc{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.08)}.pc img{display:block;width:100%}
+.pc span{display:block;font-size:12px;font-weight:700;padding:6px 10px}.pc.lockd img{filter:grayscale(1) brightness(1.2) blur(3px);opacity:.5}
+.stgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0;background:#fff;border-radius:16px;padding:10px}
+.stgrid img{width:100%;aspect-ratio:1;object-fit:contain}.stgrid img.lockd{filter:grayscale(1) brightness(0);opacity:.12}
+.skins{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{padding:8px 12px;border-radius:999px;background:var(--surface3);font-size:13px;font-weight:700;color:var(--text2)}
+.chip.on{background:var(--teal);color:#fff}.chip.lockd{opacity:.6}
+.upg{margin-top:6px;width:100%}
+.grpbox{margin:8px 0}
+#lbSeg button{white-space:normal;font-size:12px;padding:6px 4px;min-height:44px}
 /* boot screen: shown until the illustrated art is ready, so the old placeholder figures never flash */
 .boot{background:var(--bg);align-items:center;justify-content:center;z-index:40;transition:opacity .35s}
 .boot.out{opacity:0;pointer-events:none}
@@ -514,6 +542,10 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <span class="row-text"><b id="chCardT">Challenge</b><small id="chCardS"></small></span>
         <span class="badge" style="background:#fff;color:#0a3d7a" data-i18n="accept">Accept</span>
       </button>
+      <button class="row hidden" id="rivalBtn">
+        <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></span>
+        <span class="row-text"><b id="rivalT"></b><small id="rivalS"></small></span>
+      </button>
       <div class="pickers">
         <small class="plabel" data-i18n="pickLine">Line</small>
         <div class="seg" id="lineSeg"></div>
@@ -534,6 +566,11 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
       <div class="shelf-head"><h3 data-i18n="commuters">Commuters</h3><button class="link" id="charsBtn" data-i18n="seeAll">See all</button></div>
       <div class="shelf" id="shelf"></div>
 
+      <button class="row" id="storyBtn">
+        <img class="row-thumb" id="storyThumb" alt="">
+        <span class="row-text"><b data-i18n="storyTitle">The regulars</b><small id="storySub"></small></span>
+        <svg class="chev" viewBox="0 0 9 15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5l6 6-6 6"/></svg>
+      </button>
       <button class="row" id="missionsBtn">
         <span class="row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></span>
         <span class="row-text"><b data-i18n="missions">Missions</b><small id="missionSub"></small></span>
@@ -582,7 +619,27 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.5.0</p>
+      <p class="ver">Mumbai Local Straphanger 1.6.0</p>
+    </div>
+  </div>
+
+  <!-- LOGIN CALENDAR -->
+  <div id="cal" class="overlay sheet-wrap hidden">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 data-i18n="calTitle">Daily pass</h2><button class="done" id="calClose" data-i18n="done">Done</button></div>
+      <p class="hint" data-i18n="calHow"></p>
+      <div class="calgrid" id="calGrid"></div>
+      <button class="primary" id="calClaim" data-i18n="calClaim">Collect</button>
+    </div>
+  </div>
+  <!-- STORY -->
+  <div id="story" class="overlay sheet-wrap hidden">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 data-i18n="storyTitle">The regulars</h2><button class="done" id="storyClose" data-i18n="done">Done</button></div>
+      <p class="hint" data-i18n="storyHow"></p>
+      <div class="storylist" id="storyList"></div>
     </div>
   </div>
 
@@ -603,12 +660,17 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
       <div class="sheet-head"><h2 data-i18n="recordsTitle">My best rides</h2><button class="done" id="recordsClose" data-i18n="done">Done</button></div>
       <div class="stats" id="recStats"></div>
       <h3 class="subhead" data-i18n="lbTitle">Leaderboard</h3>
-      <div class="seg" id="lbSeg"><button data-b="week" data-i18n="lbWeek">This week</button><button data-b="best" class="on" data-i18n="lbBest">Longest ride</button><button data-b="total" data-i18n="lbTotal">Total distance</button></div>
+      <div class="seg" id="lbSeg"><button data-b="friends" data-i18n="lbFriends">Friends</button><button data-b="week" data-i18n="lbWeek">This week</button><button data-b="best" class="on" data-i18n="lbBest">Longest ride</button><button data-b="total" data-i18n="lbTotal">Total distance</button></div>
       <div class="lbname hidden" id="lbName"><input id="lbNameIn" maxlength="16" autocomplete="off" spellcheck="false"><button class="primary" id="lbNameSave" data-i18n="lbJoin">Join</button></div>
+      <div class="grpbox hidden" id="grpBox"><p class="hint" data-i18n="grpHow"></p><div class="pair"><button class="secondary hl" id="grpCreate" data-i18n="grpCreate">Create a group</button><button class="secondary" id="grpShare" data-i18n="grpShare">Invite friends</button></div><p class="hint" id="grpCode"></p></div>
       <ol class="reclist lblist" id="lbList"></ol>
       <p class="hint" id="lbHint"></p>
       <h3 class="subhead" style="margin-top:16px" data-i18n="recordsTitle">My best rides</h3>
       <ol class="reclist" id="reclist"></ol>
+      <h3 class="subhead" style="margin-top:16px" data-i18n="postcards">Postcards</h3>
+      <div class="pcgrid" id="pcGrid"></div>
+      <h3 class="subhead" style="margin-top:16px"><span data-i18n="stickers">Sticker album</span> <small id="stCount"></small></h3>
+      <div class="stgrid" id="stGrid"></div>
       <h3 class="subhead" style="margin-top:16px" data-i18n="playtest">Playtest data</h3>
       <div class="list" id="ptList"></div>
       <button class="secondary" id="copyStats" style="width:100%" data-i18n="copyStats">Copy playtest data</button>
@@ -622,6 +684,8 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
       <p class="eyebrow" data-i18n="fell">Gir gaya!</p>
       <div class="big-stat"><b id="oDist">0 m</b><span id="newBest" class="nb hidden" data-i18n="newHigh">New best</span></div>
       <p class="reason" id="reason"></p>
+      <p class="nearmiss" id="nearMiss"></p>
+      <div class="drops" id="oDrops"></div>
       <div class="route" id="oRoute"></div>
       <div class="pair hidden" id="replayRow" style="margin:-4px 0 14px">
         <button class="secondary hl" id="replayBtn">&#9654; <span data-i18n="watchReplay">Watch your best save</span></button>
@@ -752,6 +816,8 @@ function festivalToday(d){
 }
 const FESTIVAL = festivalToday();
 const FEST_BONUS = FESTIVAL ? 1.2 : 1;
+// Mumbai rush hours (8-10 am, 6-8 pm IST, whatever the phone's time zone): coins x2
+const peakNow = () => { const d = new Date(Date.now() + 5.5 * 36e5), h = d.getUTCHours(); return (h >= 8 && h < 10) || (h >= 18 && h < 20); };
 // monsoon season (7 Jun - 30 Sep): rain events come twice as often
 const SEASON = (() => { const d = new Date(), md = (d.getMonth() + 1) * 100 + d.getDate(); return md >= 607 && md <= 930 ? 'monsoon' : null; })();
 // "Lean to choose": items offered on the left and right at each station
@@ -853,6 +919,12 @@ function lbSubmit(){
     p_week: save.week.k, p_week_best: save.week.best, p_ride: r.d, p_secs: r.s }).catch(() => {});
 }
 async function lbLoad(board){
+  if (board === 'friends') {
+    if (!save.group) return { rows: [], rank: 0 };
+    const rows = await (await lbFetchRaw('rpc/group_board', 'POST', { p_code: save.group })).json();
+    rows.sort((a, b) => b.week_best - a.week_best); rows.forEach(r => { r.best = r.week_best; });
+    return { rows, rank: 1 + rows.findIndex(r => r.name === save.name) };
+  }
   const col = board === 'total' ? 'total' : board === 'week' ? 'week_best' : 'best', wk = board === 'week' ? '&week=eq.' + weekKey() : '';
   const mine = board === 'total' ? save.totals.dist : board === 'week' ? (save.week.k === weekKey() ? save.week.best : 0) : save.best;
   const rows = await (await lbFetchRaw('scores?select=name,best,total,level,week_best&order=' + col + '.desc&limit=50' + wk)).json();
@@ -864,11 +936,17 @@ let lbBoard = 'best';
 function lbDemo(board){ // sample rows for screenshots and when offline
   const n = [['Priya', 2310, 41250, 24], ['Arjun', 1980, 38800, 22], ['Meera', 1640, 29120, 18], ['Kabir', 1210, 25400, 16], ['Sana', 990, 17330, 12]];
   const me = [save.name || T('you'), save.best, save.totals.dist, save.passLv, 1];
-  if (board === 'week') { n.forEach(r => { r[1] = Math.round(r[1] * 0.55); }); me[1] = save.week.k === weekKey() ? save.week.best : 0; }
+  if (board === 'friends') n.splice(3);
+  if (board === 'week' || board === 'friends') { n.forEach(r => { r[1] = Math.round(r[1] * 0.55); }); me[1] = save.week.k === weekKey() ? save.week.best : 0; }
+  if (board === 'friends' && !save.group) return { rows: [], rank: 0 };
   const all = n.concat([me]).sort((a, b) => board === 'total' ? b[2] - a[2] : b[1] - a[1]);
   return { rows: all.map(r => ({ name: r[0], best: r[1], total: r[2], level: r[3], me: r[4] })), rank: all.indexOf(me) + 1 };
 }
+function groupLink(){ return GAME_URL + '?g=' + save.group; }
+function joinGroup(code){ save.group = code; persist(); if (lbOn() && save.name) lbFetchRaw('rpc/join_group', 'POST', { p_id: save.pid, p_code: code }).catch(() => {}); }
 function renderLb(){
+  $('grpBox').classList.toggle('hidden', lbBoard !== 'friends');
+  if (lbBoard === 'friends') { $('grpCode').textContent = save.group ? T('grpCodeIs', save.group) : ''; $('grpShare').classList.toggle('hidden', !save.group); $('grpCreate').classList.toggle('hidden', !!save.group); }
   document.querySelectorAll('#lbSeg button').forEach(b => b.classList.toggle('on', b.dataset.b === lbBoard));
   const needName = !save.name && !SHOT; $('lbName').classList.toggle('hidden', !needName);
   $('lbNameIn').placeholder = T('lbNamePh');
@@ -895,7 +973,7 @@ function renderLb(){
 const SAVE_KEY = 'mls_save_v2';
 const DEFAULT_SAVE = { best: 0, coins: 0, owned: ['rahul'], char: 'rahul',
   settings: { sfx: true, music: true, vib: true, shake: true, hq: true, lang: '', voice: true, easy: false, cbSafe: false, oneThumb: false, bigText: false, reduceMotion: false, shareStats: false, notif: true },
-  week: { k: '', best: 0 }, missionDay: '', shieldWeek: '', festClaim: '', installDay: '', allDoneDay: '',
+  week: { k: '', best: 0 }, missionDay: '', skin: {}, abilLv: {}, postcards: [], stickers: [], pbTrace: '', pbD: 0, group: '', cal: { n: 0, last: '' }, story: { n: 0, day: '' }, shieldWeek: '', festClaim: '', installDay: '', allDoneDay: '',
   tutorialDone: false, missions: [], missionSeq: 0, totals: { dist: 0, runs: 0 },
   daily: { date: '', best: 0, rewarded: false, streak: 0 }, records: [],
   line: 'western', stand: 'middle', acc: '', accOwned: [], name: '', xp: -1, passLv: 0, pid: '',
@@ -925,6 +1003,10 @@ function normalize(s){
   if (!/^[0-9a-f-]{36}$/.test(d.pid)) d.pid = newId();
   if (!d.week || typeof d.week !== 'object') d.week = { k: '', best: 0 };
   if (!d.installDay) d.installDay = dayKey();
+  for (const k of ['skin', 'abilLv']) if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {};
+  for (const k of ['postcards', 'stickers']) if (!Array.isArray(d[k])) d[k] = [];
+  if (!d.cal || typeof d.cal !== 'object') d.cal = { n: 0, last: '' };
+  if (!d.story || typeof d.story !== 'object') d.story = { n: 0, day: '' };
   return d;
 }
 function loadLocal(){
@@ -1335,7 +1417,7 @@ function reset(){
     rec: [], pendingSave: null, bestSave: null, trace: [], gaspArmed: true, shoutT: 0, replay: null, rideSecs: 0 });
   particles.length = 0; popups.length = 0;
 }
-function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records', 'pass']) $(id).classList.add('hidden'); syncSheetOpen(); }
+function hideOverlays(){ for (const id of ['start', 'over', 'pause', 'chars', 'missions', 'settings', 'records', 'pass', 'cal', 'story']) $(id).classList.add('hidden'); syncSheetOpen(); }
 const anyPanelOpen = () => ['chars', 'missions', 'settings', 'records'].some(id => !$(id).classList.contains('hidden'));
 function startGame(mode){
   mode = mode === 'daily' || mode === 'challenge' ? mode : 'normal';
@@ -1344,7 +1426,7 @@ function startGame(mode){
   // every ride is seeded, so any ride can be sent to a friend as a challenge
   S.seed = mode === 'daily' ? strHash('mls-ride-' + dayKey()) : mode === 'challenge' ? (S.challenge.s >>> 0) : (Math.random() * 4294967296) >>> 0;
   S.line = mode === 'daily' ? 'western' : mode === 'challenge' ? (LINES[S.challenge.l] ? S.challenge.l : 'western') : save.line;
-  S.ghost = mode === 'challenge' ? S.challenge : null;
+  S.ghost = mode === 'challenge' ? S.challenge : (mode === 'normal' && save.pbTrace && save.pbD > 60 ? { d: save.pbD, trace: traceDec(save.pbTrace), pb: true } : null); // race your own best
   gRng = mulberry(S.seed);
   ensureAudio(); clearInput(); reset(); hideOverlays();
   S.runId = Date.now();
@@ -1352,6 +1434,7 @@ function startGame(mode){
   if (!save.tutorialDone && !SHOT) { S.pendingMode = mode; startTutorial(); return; }
   S.state = 'playing'; $('pauseBtn').style.visibility = '';
   S.abilCd = 6; S.abilT = 0; // first use after a few seconds
+  S.peak = peakNow(); if (S.peak) setTimeout(() => banner(T('peakT'), T('peakSub'), '#e53935'), 2600);
   // adaptive difficulty: gentler after three quick falls in a row, tougher for players who ride long (not in seeded daily/challenge rides)
   const rec = save.stats.recent.slice(-3).map(r => r[0]);
   S.adapt = mode !== 'normal' || rec.length < 3 ? 1 : rec.every(x => x < 25) ? 0.85 : rec.every(x => x > 120) ? 1.1 : 1;
@@ -1397,12 +1480,13 @@ function quitToMenu(){
   $('start').classList.remove('hidden');
 }
 function award(n, label){
-  n = Math.max(1, Math.round(n * CHARS[save.char].coin * (save.stand === 'door' ? 1.5 : 1) * FEST_BONUS));
+  n = Math.max(1, Math.round(n * CHARS[save.char].coin * (save.stand === 'door' ? 1.5 : 1) * FEST_BONUS * (S.peak ? 2 : 1)));
   S.runCoins += n;
   if (label) { popup(label + ' +' + n, '#ffd23f', 24, H * 0.42); sfxCoin(); }
 }
 function arrive(){
   const name = stationName(S.level);
+  if (S.line === 'western' && S.mode !== 'challenge') { const pi = POSTCARD_ST.indexOf(S.level % nSt('western')); if (pi > 0) { const pc = unlockPostcard(pi); if (pc) setTimeout(() => banner(T('postcardT'), pc.text, '#f39c12'), 2600); } }
   S.boardT = 2.4; S.boardName = name; S.flash = 0.5;
   sfxStation(); vib([10, 60, 10, 60, 10]); // station: three soft taps
   award(20);
@@ -1464,9 +1548,11 @@ const ABIL = {
   ganesh: { dur: 3.5, cd: 18 }  // Quick hands: steer 60% harder
 };
 const abilOn = k => S.abilT > 0 && heroKey() === k;
+const ABIL_COST = [300, 700];
+function abilStat(k){ const lv = save.abilLv[k] || 0; return { dur: ABIL[k].dur * (1 + 0.3 * lv), cd: Math.round(ABIL[k].cd * (1 - 0.15 * lv)), lv }; } // each upgrade: +30% duration, -15% cooldown
 function useAbility(){
   if (S.state !== 'playing' || S.abilCd > 0) return;
-  const k = heroKey(), a = ABIL[k]; S.abilCd = a.cd; S.abilT = a.dur;
+  const k = heroKey(), a = abilStat(k); S.abilCd = a.cd; S.abilT = a.dur;
   if (k === 'rahul') { S.grip = Math.min(100, S.grip + 50); S.tiltVel *= 0.3; S.exhausted = false; }
   banner(T('abil_' + k), T('abilDo_' + k), '#f39c12'); sfxMission(); vib([20, 30, 20]);
   spawn(G.cx, G.floorY - H * 0.25, 18, { spread: Math.PI * 2, v0: 80, v1: 260, g: 120, colors: ['#ffbb45', '#ffffff', '#f39c12'], kind: 'star' });
@@ -1475,7 +1561,7 @@ function useAbility(){
 function syncAbil(){
   const b = $('abilBtn'); if (!b) return;
   const show = S.state === 'playing'; b.classList.toggle('hidden', !show); if (!show) return;
-  const k = heroKey(), a = ABIL[k], ready = S.abilCd <= 0;
+  const k = heroKey(), a = abilStat(k), ready = S.abilCd <= 0;
   b.classList.toggle('ready', ready); b.classList.toggle('active', S.abilT > 0);
   b.style.setProperty('--p', ready ? 1 : 1 - S.abilCd / a.cd);
   $('abilName').textContent = T('abil_' + k);
@@ -1585,6 +1671,21 @@ function gameOver(){
   popup(T('arre'), '#ff4d6d', 38, H * 0.5);
   spawn(clamp(S.shX, 20, W - 20), clamp(S.shY, 60, H - 60), 26, { spread: Math.PI, v0: 80, v1: 320, g: 300, colors: ['#ffd23f', '#ffffff', '#ff4d6d'], kind: 'star' });
 }
+let sessionPlay = 0, nudged = false;
+const POSTCARD_ST = [0, 1, 2, 3, 4, 8]; // Western line: Churchgate, Mumbai Central, Dadar, Bandra, Andheri, Virar
+function unlockPostcard(i){ if (save.postcards.includes(i)) return null; save.postcards.push(i); return { img: 'art/postcard-' + i + '.webp', text: T('newPostcard', lineStations('western')[POSTCARD_ST[i]]) }; }
+function rideDrops(){ // collectibles earned by this ride (visual only, never random-for-money)
+  const out = [];
+  if (S.mode !== 'challenge' && S.line === 'western') { const pc = unlockPostcard(0); if (pc) out.push(pc); }
+  if (S.playT > 15 && gchanceVisual(0.45)) {
+    const n = Math.random() * 30 | 0;
+    if (save.stickers.includes(n)) { save.coins += 20; out.push({ img: 'art/sticker-' + n + '.webp', text: T('stickerDup') }); }
+    else { save.stickers.push(n); out.push({ img: 'art/sticker-' + n + '.webp', text: T('newSticker', save.stickers.length) }); }
+  }
+  if (save.story.day !== dayKey() && S.playT > 10 && save.story.n < 8) { save.story.day = dayKey(); save.story.n++; out.push({ img: 'art/story-' + (save.story.n - 1) + '.webp', text: T('newStory', save.story.n) }); }
+  persist(); return out;
+}
+const gchanceVisual = p => Math.random() < p; // not the seeded ride RNG: drops must not change challenge rides
 function showOver(){
   S.state = 'over';
   const prevBest = save.best;
@@ -1603,6 +1704,9 @@ function showOver(){
   if (S.mode === 'daily') save.daily.best = Math.max(save.daily.best, Math.floor(S.dist));
   bankRun();
   S.lastRide = { d: Math.floor(S.dist), s: Math.max(1, Math.round(S.playT)) };
+  if (Math.floor(S.dist) > (save.pbD || 0) && S.mode === 'normal') { save.pbD = Math.floor(S.dist); save.pbTrace = traceEnc(S.trace.slice(0, 600)); }
+  sessionPlay += S.playT - (S.sessionCounted || 0); S.sessionCounted = S.playT;
+  const drops = rideDrops();
   if (save.week.k !== weekKey()) save.week = { k: weekKey(), best: 0 };
   save.week.best = Math.max(save.week.best, Math.floor(S.dist));
   const totXp = Math.floor(S.dist) + 15 * S.nears + (S.mode === 'daily' ? 100 : 0), runXp = Math.max(0, totXp - S.xpGiven); S.xpGiven = Math.max(S.xpGiven, totXp); // safe after a second chance
@@ -1614,6 +1718,10 @@ function showOver(){
   persist();
   const d = Math.floor(S.dist), nb = d > prevBest;
   $('reason').textContent = S.reason;
+  // the "almost" line: how close the next station or your best was
+  const into = S.dist - S.level * SEG, toNext = Math.ceil(SEG - into), gap = prevBest - d;
+  $('nearMiss').textContent = gap > 0 && gap <= 60 ? T('nearBest', gap) : toNext <= 60 ? T('nearStation', toNext, stationName(S.level + 1)) : '';
+  $('oDrops').innerHTML = ''; for (const dr of drops) { const el = document.createElement('div'); el.className = 'drop'; el.innerHTML = '<img alt=""><span></span>'; el.querySelector('img').src = dr.img; el.querySelector('span').textContent = dr.text; $('oDrops').appendChild(el); }
   $('oDist').textContent = d + ' m';
   $('oSt').textContent = stationName(S.level);
   $('oBest').textContent = save.best + ' m';
@@ -1623,6 +1731,7 @@ function showOver(){
   $('newBest').classList.toggle('hidden', !nb);
   $('replayRow').classList.toggle('hidden', !S.bestSave);
   $('oChRow').classList.toggle('hidden', S.mode !== 'challenge');
+  $('chBtn').textContent = S.mode === 'challenge' && d > S.challenge.d ? T('rematch') : T('sendChallenge');
   if (S.mode === 'challenge') { const diff = d - S.challenge.d, who = S.challenge.n || T('aFriend'); $('oChLbl').textContent = diff > 0 ? T('chWin', who, diff) : T('chLose', who, -diff); $('oCh').textContent = S.challenge.d + ' m'; }
   countUp($('oDist'), d, ' m'); countUp($('oCoins'), S.runCoins, '');
   $('oPassXp').textContent = T('xpGain', S.xpGiven); fillPass($('oPassLv'), null, $('oPassBar'), $('oPassNext'));
@@ -1641,6 +1750,7 @@ function showOver(){
   $('hud').classList.add('hidden');
   $('over').classList.remove('hidden');
   overShownAt = performance.now();
+  if (sessionPlay > 20 * 60 && !nudged) { nudged = true; setTimeout(() => banner(T('breakTitle'), T('breakSub'), '#1f9d55'), 1600); } // healthy play: one friendly nudge per session
 }
 function continueRun(viaAd){
   if (S.continued || S.state !== 'over' || (!viaAd && save.coins < 100)) return;
@@ -1780,7 +1890,7 @@ function update(dt){
   // --- scoring & fail ---
   if (playing) {
     const a = Math.abs(S.tilt);
-    S.coinAcc += S.speed * dt / 10;
+    S.coinAcc += S.speed * dt / 10 * (S.peak ? 2 : 1);
     if (S.coinAcc >= 1) { const n = Math.floor(S.coinAcc); S.coinAcc -= n; S.runCoins += n; }
     if (a < 12) { S.steadyT += dt; if (S.steadyT >= 5) { S.steadyT = 0; S.steadies++; award(5, T('steady')); } } else S.steadyT = 0;
     if (a > LIM() - 9) S.nearArmed = true;
@@ -1877,7 +1987,7 @@ function updateBuffs(dt){
   // ghost trace for challenges: one sample every 4 m
   const ti = Math.floor(S.dist / 4);
   while (S.trace.length <= ti && S.trace.length < 1500) S.trace.push(clamp(Math.round(S.tilt), -60, 60));
-  if (S.ghost && !S.ghostPassed && S.dist > S.ghost.d) { S.ghostPassed = true; popup(T('chPassed', S.ghost.n || T('aFriend')), '#64d2ff', 26, H * 0.4); sfxMission(); }
+  if (S.ghost && !S.ghostPassed && S.dist > S.ghost.d) { S.ghostPassed = true; popup(S.ghost.pb ? T('pbPassed') : T('chPassed', S.ghost.n || T('aFriend')), S.ghost.pb ? '#ffd60a' : '#64d2ff', 26, H * 0.4); sfxMission(); }
 }
 // --- replay recorder: keeps ~5 s of the ride; the best clutch save is kept for the game-over screen ---
 const REC_KEYS = ['t', 'tilt', 'strapA', 'force', 'scroll', 'dist', 'level', 'event', 'eventT', 'eventDur', 'evSide', 'danger', 'grip', 'cueK', 'nextJerkDir', 'reliefT', 'cheerT', 'seatT', 'speed', 'exhausted'];
@@ -1965,7 +2075,8 @@ function readChallenge(){
   } catch(e){ return null; }
 }
 async function sendChallenge(){
-  const url = challengeLink(), text = T('chShare', Math.floor(S.dist), stationName(S.level, S.line));
+  const url = challengeLink(), beat = S.mode === 'challenge' && S.challenge && Math.floor(S.dist) > S.challenge.d;
+  const text = beat ? T('rematchShare', S.challenge.n || T('aFriend'), Math.floor(S.dist)) : T('chShare', Math.floor(S.dist), stationName(S.level, S.line));
   const Sh = cap('Share');
   if (Sh) { try { await Sh.share({ title: 'Mumbai Local Straphanger', text, url }); } catch(e){} return; }
   if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) { try { await navigator.share({ text, url }); return; } catch(e){ if (e && e.name === 'AbortError') return; } }
@@ -2549,7 +2660,7 @@ function drawGhost(){
   ctx.beginPath(); ctx.moveTo(-tw * 0.18, -leg); ctx.lineTo(-tw * 0.26, 0); ctx.moveTo(tw * 0.18, -leg); ctx.lineTo(tw * 0.26, 0); ctx.stroke();
   ctx.beginPath(); ctx.arc(0, -leg - tor - hr, hr * 0.9, 0, TAU); ctx.fill(); ctx.stroke();
   ctx.globalAlpha = 0.8; ctx.fillStyle = '#64d2ff'; ctx.font = `700 ${Math.round(8 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'center';
-  ctx.fillText(S.ghost.n || T('aFriend'), 0, -leg - tor - hr * 2.4);
+  ctx.fillText(S.ghost.pb ? T('pbGhost') : (S.ghost.n || T('aFriend')), 0, -leg - tor - hr * 2.4);
   ctx.restore();
 }
 function drawForeground(){
@@ -2727,13 +2838,17 @@ const artWait = () => !sprReady && !artGaveUp;
 // eye-line centre (x, y as fractions of the calm sprite) and face half-width (fraction of width), measured from the art
 const HEAD = { rahul: { x: 0.41, y: 0.31, r: 0.28, top: 0.2 }, desai: { x: 0.55, y: 0.31, r: 0.23, top: 0.24 }, sunita: { x: 0.42, y: 0.31, r: 0.19, top: 0.235 }, ganesh: { x: 0.48, y: 0.32, r: 0.285, top: 0.2 } };
 // one shared scale per character, from its calm pose: feet on the floor, ring just below the rail
+// seasonal outfits, earned on the commuter pass (art: Figma AI pose sheets, same rig as the base characters)
+const SKINS = { rahul: { monsoon: 8 }, ganesh: { diwali: 18 } };
+const skinOpen = (k, sk) => save.passLv >= SKINS[k][sk];
+const sk = key => { const v = save.skin[key]; return v && SKINS[key] && SKINS[key][v] && sprOk('p-' + key + v + '-calm') ? key + v : key; };
 function charScale(key){
-  const c = SPR['p-' + key + '-calm'];
+  const c = SPR['p-' + sk(key) + '-calm'];
   return (G.floorY - (G.railY + G.L * 0.32)) / (c.foot[1] - c.top[1]);
 }
 function poseKey(key, mood, seated){
   const p = seated ? 'sit' : mood === 'ko' ? 'panic' : (mood === 'calm' || mood === 'worry' || mood === 'panic' || mood === 'relief') ? mood : 'calm';
-  return 'p-' + key + '-' + p;
+  return 'p-' + sk(key) + '-' + p;
 }
 function liveStrap(px, py, rx, ry){ // leather strap from the rail clamp down to the ring
   ctx.lineCap = 'round';
@@ -2778,7 +2893,7 @@ function stepHanger(h, targetX, dt){ // the clamp slides toward the point above 
 }
 function updateHangers(dt){
   if (!sprReady) return;
-  const key = heroKey(), sp = SPR[poseKey(key, moodOf(), false)] || SPR['p-' + key + '-calm'];
+  const key = heroKey(), sp = SPR[poseKey(key, moodOf(), false)] || SPR['p-' + sk(key) + '-calm'];
   S.feet = S.feet || newFeet();
   if (S.seatT <= 0 && S.state !== 'falling') stepFeet(S.feet, S.tilt, dt);
   if (sp && sp.arm) { const g = shoulderOf(sp, charScale(key), G.cx, G.floorY, S.tilt * DEG, 1, S.feet); if (g) stepHanger(S.hang || (S.hang = {}), g.sx, dt); }
@@ -2836,9 +2951,9 @@ function drawHanger(sp, sc, fx, fy, ang, flip, hang, opts, st){
   const f = sp.face; opts.head = f ? C.up(f.ex, f.y0) : null;
 }
 function drawPlayerSprite(){
-  const key = heroKey(); if (!sprReady || !sprOk('p-' + key + '-calm')) return false;
+  const key = heroKey(); if (!sprReady || !sprOk('p-' + sk(key) + '-calm')) return false;
   const mood = moodOf(), seated = S.seatT > 0, pk = poseKey(key, mood, seated && S.seatT > 0.35 && S.seatT < 5.65);
-  const sp = SPR[pk] || SPR['p-' + key + '-calm'], c = SPR['p-' + key + '-calm'], sc = charScale(key);
+  const sp = SPR[pk] || SPR['p-' + sk(key) + '-calm'], c = SPR['p-' + sk(key) + '-calm'], sc = charScale(key);
   const th = seated ? 0 : S.tilt * DEG, fx = G.cx, fy = G.floorY;
   G.px = S.hang && S.hang.x !== undefined ? S.hang.x : fx + (c.top[0] - c.foot[0]) * sc;
   ctx.save(); ctx.beginPath(); ctx.ellipse(fx + Math.sin(th) * 20, fy + 4, G.tw * 0.85, G.tw * 0.15, 0, 0, TAU); ctx.clip(); hatchRect(fx - G.tw * 1.3, fy - G.tw, G.tw * 2.8, G.tw * 2, 0.7); ctx.restore();
@@ -3123,7 +3238,12 @@ function missionEl(m){
   d.querySelector('span').textContent = MT[m.type].text(m.n) + (MT[m.type].ride || m.done ? '' : ` (${prog}/${m.n})`);
   return d;
 }
+function renderHomeExtras(){
+  $('storyThumb').src = 'art/story-' + Math.max(0, save.story.n - 1) + '.webp';
+  $('storySub').textContent = save.story.n ? T('storyProg', save.story.n) : T('storyFirst');
+}
 function renderPickers(){
+  renderHomeExtras();
   if (!lineOpen(save.line)) save.line = 'western';
   fillPass($('passLv'), $('passRank'), $('passBar'), $('passNext'));
   const ls = $('lineSeg'); ls.innerHTML = '';
@@ -3134,8 +3254,41 @@ function renderPickers(){
   }
   document.querySelectorAll('#standSeg button').forEach(b => { b.classList.toggle('on', save.stand === b.dataset.v); });
 }
+function renderCollection(){
+  const pg = $('pcGrid'); pg.innerHTML = '';
+  POSTCARD_ST.forEach((st, i) => { const got = save.postcards.includes(i), el = document.createElement('div'); el.className = 'pc' + (got ? '' : ' lockd');
+    el.innerHTML = '<img alt=""><span></span>'; el.querySelector('img').src = 'art/postcard-' + i + '.webp'; el.querySelector('span').textContent = got ? lineStations('western')[st] : '\uD83D\uDD12 ' + lineStations('western')[st]; pg.appendChild(el); });
+  const sg = $('stGrid'); sg.innerHTML = ''; $('stCount').textContent = save.stickers.length + ' / 30';
+  for (let i = 0; i < 30; i++) { const im = new Image(); im.alt = ''; im.src = 'art/sticker-' + i + '.webp'; im.className = save.stickers.includes(i) ? '' : 'lockd'; sg.appendChild(im); }
+}
+const CAL_REWARD = [30, 40, 50, 60, 80, 100, 250];
+function renderCal(){
+  const g = $('calGrid'); g.innerHTML = ''; const today = save.cal.last === dayKey();
+  CAL_REWARD.forEach((r, i) => { const el = document.createElement('div'), got = i < save.cal.n || (today && i === save.cal.n - 1), cur = !today && i === save.cal.n;
+    el.className = 'calday' + (got ? ' got' : '') + (cur ? ' cur' : '') + (i === 6 ? ' big' : '');
+    el.innerHTML = '<small></small><b><i class="coin"></i></b>'; el.querySelector('small').textContent = T('dayN', i + 1); el.querySelector('b').append(String(r)); g.appendChild(el); });
+  $('calClaim').disabled = today; $('calClaim').textContent = today ? T('calBack') : T('calClaim');
+}
+function claimCal(){
+  if (save.cal.last === dayKey()) return;
+  const r = CAL_REWARD[save.cal.n]; save.coins += r; save.cal.last = dayKey(); const wasBig = save.cal.n === 6; save.cal.n = (save.cal.n + 1) % 7;
+  if (wasBig) { const n = Math.random() * 30 | 0; if (!save.stickers.includes(n)) save.stickers.push(n); }
+  persist(); sfxMission(); celebrate(); toast(T('coinsN', r)); renderCal(); refreshMenus();
+}
+function renderStory(){
+  const l = $('storyList'); l.innerHTML = ''; const caps = T('storyCaps');
+  for (let i = 0; i < 8; i++) { const el = document.createElement('div'), got = i < save.story.n; el.className = 'storyp' + (got ? '' : ' lockd');
+    el.innerHTML = '<img alt=""><p></p>'; el.querySelector('img').src = 'art/story-' + i + '.webp'; el.querySelector('p').textContent = got ? (i + 1) + '. ' + caps[i] : T('storyLocked', i + 1); l.appendChild(el); }
+}
+// weekly rival: the player just above you on this week's board (a practice rival, clearly marked, while offline)
+async function refreshRival(){
+  const mine = save.week.k === weekKey() ? save.week.best : 0; let rv = null;
+  if (lbOn()) { try { const { rows } = await lbLoad('week'); const above = rows.filter(r => r.best > mine && r.name !== save.name); if (above.length) rv = { n: above[above.length - 1].name, d: above[above.length - 1].best }; } catch(e){} }
+  if (!rv) rv = { n: T('practiceRival'), d: Math.max(150, Math.round((mine + 60) / 10) * 10), bot: true };
+  $('rivalBtn').classList.remove('hidden'); $('rivalT').textContent = T('rivalT', rv.n); $('rivalS').textContent = T('rivalS', Math.max(1, rv.d - mine));
+}
 function renderRecords(){
-  renderLb();
+  renderLb(); renderCollection();
   const st = $('recStats'); st.innerHTML = '';
   const tiles = [[T('best'), save.best + ' m'], [T('totalDist'), save.totals.dist + ' m'], [T('rides'), save.totals.runs], [T('dayStreak'), save.daily.streak]];
   for (const [k, v] of tiles) { const d = document.createElement('div'); d.innerHTML = '<small></small><b></b>'; d.querySelector('small').textContent = k; d.querySelector('b').textContent = v; st.appendChild(d); }
@@ -3272,7 +3425,25 @@ function renderChars(focusKey){
     const body = document.createElement('div'); body.className = 'body';
     body.innerHTML = '<span class="nm"></span><span class="rl"></span><span class="ds"></span><div class="abil"><i><span>E</span></i><span><b></b><small></small></span></div>';
     body.querySelector('.nm').textContent = tx.name; body.querySelector('.rl').textContent = tx.role; body.querySelector('.ds').textContent = tx.desc;
-    body.querySelector('.abil b').textContent = T('abil_' + k); body.querySelector('.abil small').textContent = T('abilDo_' + k) + ' \u00B7 ' + T('abilCd', ABIL[k].cd);
+    body.querySelector('.abil b').textContent = T('abil_' + k); body.querySelector('.abil small').textContent = T('abilDo_' + k) + ' \u00B7 ' + T('abilCd', abilStat(k).cd) + (abilStat(k).lv ? ' \u00B7 ' + T('lv') + ' ' + (abilStat(k).lv + 1) : '');
+    if (owned) { // ability upgrade + outfits
+      const lv = save.abilLv[k] || 0;
+      if (lv < ABIL_COST.length) {
+        const up = document.createElement('button'); up.className = 'secondary upg'; up.innerHTML = T('abilUp') + ' \u00B7 <i class="coin"></i>' + ABIL_COST[lv];
+        up.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); if (save.coins < ABIL_COST[lv]) { toast(T('needCoins', ABIL_COST[lv] - save.coins)); return; } save.coins -= ABIL_COST[lv]; save.abilLv[k] = lv + 1; persist(); sfxMission(); vib(30); toast(T('abilUpDone', T('abil_' + k))); renderChars(k); });
+        body.appendChild(up);
+      }
+      if (SKINS[k]) {
+        const row = document.createElement('div'); row.className = 'skins';
+        for (const v of [''].concat(Object.keys(SKINS[k]))) {
+          const b = document.createElement('button'), open = !v || skinOpen(k, v), on = (save.skin[k] || '') === v;
+          b.className = 'chip' + (on ? ' on' : '') + (open ? '' : ' lockd'); b.textContent = v ? T('skin_' + v) + (open ? '' : ' \uD83D\uDD12 ' + T('lv') + ' ' + SKINS[k][v]) : T('skin_classic');
+          b.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sfxTap(); if (!open) { toast(T('skinLocked', SKINS[k][v])); return; } save.skin[k] = v; persist(); renderChars(k); });
+          row.appendChild(b);
+        }
+        body.appendChild(row);
+      }
+    }
     for (const [lbl, fn] of Object.entries(STAT_FN)) { const r = document.createElement('div'); r.className = 'stat'; r.innerHTML = '<span></span><i><b></b></i>'; r.querySelector('span').textContent = T(lbl); r.querySelector('b').style.width = Math.round(fn(c) * 100) + '%'; body.appendChild(r); }
     const cta = document.createElement('button'); cta.className = 'cta';
     if (cur) { cta.textContent = T('riding'); cta.classList.add('cur'); }
@@ -3480,8 +3651,16 @@ on('recordsBtn', () => { renderRecords(); openPanel('records'); });
 $('abilBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); ensureAudio(); useAbility(); });
 on('passBtn', () => { ensureAudio(); sfxTap(); renderPass(); openPanel('pass'); });
 on('passClose', () => closePanel('pass'));
+on('calClose', () => closePanel('cal')); on('calClaim', () => { ensureAudio(); claimCal(); });
+on('storyBtn', () => { ensureAudio(); sfxTap(); renderStory(); openPanel('story'); }); on('storyClose', () => closePanel('story'));
+on('rivalBtn', () => { ensureAudio(); sfxTap(); lbBoard = 'week'; renderRecords(); openPanel('records'); });
+on('grpCreate', () => { ensureAudio(); const c = Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.random() * 32 | 0]).join(''); joinGroup(c); renderLb(); });
+on('grpShare', async () => { const text = T('grpInvite', save.group); const url = groupLink();
+  const Sh = cap('Share'); if (Sh) { try { await Sh.share({ text, url }); } catch(e){} return; }
+  if (navigator.share) { try { await navigator.share({ text, url }); return; } catch(e){ if (e && e.name === 'AbortError') return; } }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank'); });
 document.querySelectorAll('#lbSeg button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); lbBoard = b.dataset.b; renderLb(); }));
-on('lbNameSave', () => { const v = $('lbNameIn').value.replace(/[^\p{L}\p{N} ._-]/gu, '').trim().slice(0, 16); if (!v) { toast(T('lbNamePh')); return; } save.name = v; persist(); lbSubmit(); renderLb(); });
+on('lbNameSave', () => { const v = $('lbNameIn').value.replace(/[^\p{L}\p{N} ._-]/gu, '').trim().slice(0, 16); if (!v) { toast(T('lbNamePh')); return; } save.name = v; persist(); lbSubmit(); if (save.group) joinGroup(save.group); renderLb(); });
 on('recordsClose', () => closePanel('records'));
 on('againBtn', () => { if (performance.now() - overShownAt > 600) startGame(S.mode); });
 on('contBtn', () => continueRun(false));
@@ -3555,6 +3734,8 @@ if (window.ResizeObserver) new ResizeObserver(layout).observe(game);
 })();
 S.challenge = readChallenge();
 layout(); applyI18n(); applyA11y(); scheduleReminders(); tickLed();
+{ const g = new URLSearchParams(location.search).get('g'); if (g && /^[A-Z2-9]{6}$/.test(g)) { joinGroup(g); setTimeout(() => toast(T('grpJoined', g)), 1200); } }
+if (!SHOT) { refreshRival(); if (save.cal.last !== dayKey() && save.tutorialDone) setTimeout(() => { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } }, 900); }
 function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
   save.tutorialDone = true;
   const sc = new URLSearchParams(location.search).get('c'); if (CHARS[sc]) { save.char = sc; save.owned = CHAR_ORDER.slice(); }
@@ -3571,6 +3752,12 @@ function runShot(){ // deterministic states for store screenshots (waits for the
   if (SHOT === 'replay') { S.autopilot = true; S.clutchDemo = true; startGame(); S.dist = 120; setTimeout(() => { S.clutchDemo = false; S.autopilot = false; }, 9000); }
   if (SHOT === 'seat') { S.autopilot = true; startGame(); S.dist = 120; setTimeout(() => takeItem('seat'), 1200); }
   if (SHOT === 'settings') { renderSettings(); openPanel('settings'); }
+  if (SHOT === 'cal') { save.cal = { n: 3, last: '' }; renderCal(); openPanel('cal'); }
+  if (SHOT === 'story') { save.story = { n: 5, day: '' }; renderStory(); openPanel('story'); }
+  if (SHOT === 'collect') { save.postcards = [0, 1, 2]; save.stickers = [0, 3, 5, 8, 12, 16, 21, 27]; save.name = 'Sijo'; renderRecords(); openPanel('records'); setTimeout(() => $('pcGrid').scrollIntoView(), 300); }
+  if (SHOT === 'skin') { save.passLv = 20; save.owned = CHAR_ORDER.slice(); save.char = new URLSearchParams(location.search).get('c') || 'rahul'; save.skin = { rahul: 'monsoon', ganesh: 'diwali' }; S.autopilot = true; startGame(); S.dist = 120; }
+  if (SHOT === 'friends') { save.name = 'Sijo'; save.group = 'K7MQ2X'; save.week = { k: weekKey(), best: 420 }; lbBoard = 'friends'; renderRecords(); openPanel('records'); }
+  if (SHOT === 'shopup') { save.coins = 900; save.passLv = 20; save.owned = CHAR_ORDER.slice(); save.char = 'rahul'; S.previewChar = 'rahul'; $('charsBtn').click(); renderChars('rahul'); }
   if (SHOT === 'pass') { save.xp = 2350; save.passLv = passInfo(2350).L; renderPass(); openPanel('pass'); }
   if (SHOT === 'records') { save.name = 'Sijo'; save.records = [{ id: 1, d: 1240, lv: 4, c: 'desai', t: dayKey(), m: 'daily' }, { id: 2, d: 812, lv: 3, c: 'rahul', t: dayKey(), m: 'normal' }]; save.best = 1240; save.totals = { dist: 5320, runs: 14 }; save.daily.streak = 3; renderRecords(); openPanel('records'); }
   if (SHOT === 'play' || SHOT === 'over' || SHOT === 'event' || SHOT === 'chai') { S.autopilot = true; startGame(); S.dist = SHOT === 'play' ? 238 : 0; }
