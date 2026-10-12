@@ -454,6 +454,17 @@ html,body{color:var(--text)}
 #skipTut{background:#fff;color:var(--tabtxt);border:0;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.12);font-weight:700}
 @media (max-height:700px){.hero{min-height:26vh}.large-title{margin:10px 0 2px}}
 .reclist .dt{background:var(--gold);color:#5a3a00}
+#abilBtn{position:absolute;z-index:6;left:14px;bottom:calc(var(--bot) + 92px);width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25);touch-action:none}
+#abilBtn .ring{position:absolute;inset:-4px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p,0)*360deg),rgba(0,0,0,.15) 0);-webkit-mask:radial-gradient(circle,transparent 30px,#000 31px);mask:radial-gradient(circle,transparent 30px,#000 31px)}
+#abilBtn b{font-size:22px;font-weight:700;color:var(--text3);line-height:1}
+#abilBtn small{position:absolute;top:-22px;white-space:nowrap;font-size:11px;font-weight:700;color:#fff;background:rgba(0,0,0,.55);padding:2px 8px;border-radius:999px}
+#abilBtn.ready{background:var(--purple);animation:abilPulse 1.2s ease-in-out infinite}
+#abilBtn.ready b{color:#fff}
+#abilBtn.active{background:var(--teal)}#abilBtn.active b{color:#fff}
+@keyframes abilPulse{50%{transform:scale(1.08);box-shadow:0 4px 0 rgba(0,0,0,.25),0 0 0 8px rgba(243,156,18,.25)}}
+body.bigtext .overlay,body.bigtext #hud{zoom:1.12}
+body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!important;transition:none!important}
+#lineSeg{flex-wrap:wrap}#lineSeg button{flex:1 1 30%}
 /* boot screen: shown until the illustrated art is ready, so the old placeholder figures never flash */
 .boot{background:var(--bg);align-items:center;justify-content:center;z-index:40;transition:opacity .35s}
 .boot.out{opacity:0;pointer-events:none}
@@ -475,6 +486,7 @@ html,body{color:var(--text)}
     <div class="pill"><small data-i18n="coins">Coins</small><b><i class="coin"></i><span id="coins">0</span></b></div>
     <button id="pauseBtn" class="pill" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.2"/></svg></button>
   </div>
+  <button id="abilBtn" class="hidden" aria-label="Ability"><span class="ring"></span><b id="abilKey">E</b><small id="abilName"></small></button>
   <button id="skipTut" class="hidden" data-i18n="skipTut">Skip tutorial</button>
 
   <button id="muteBtn" class="iconbtn" aria-label="Toggle sound">
@@ -570,7 +582,7 @@ html,body{color:var(--text)}
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.4.0</p>
+      <p class="ver">Mumbai Local Straphanger 1.5.0</p>
     </div>
   </div>
 
@@ -591,7 +603,7 @@ html,body{color:var(--text)}
       <div class="sheet-head"><h2 data-i18n="recordsTitle">My best rides</h2><button class="done" id="recordsClose" data-i18n="done">Done</button></div>
       <div class="stats" id="recStats"></div>
       <h3 class="subhead" data-i18n="lbTitle">Leaderboard</h3>
-      <div class="seg" id="lbSeg"><button data-b="best" class="on" data-i18n="lbBest">Longest ride</button><button data-b="total" data-i18n="lbTotal">Total distance</button></div>
+      <div class="seg" id="lbSeg"><button data-b="week" data-i18n="lbWeek">This week</button><button data-b="best" class="on" data-i18n="lbBest">Longest ride</button><button data-b="total" data-i18n="lbTotal">Total distance</button></div>
       <div class="lbname hidden" id="lbName"><input id="lbNameIn" maxlength="16" autocomplete="off" spellcheck="false"><button class="primary" id="lbNameSave" data-i18n="lbJoin">Join</button></div>
       <ol class="reclist lblist" id="lbList"></ol>
       <p class="hint" id="lbHint"></p>
@@ -699,9 +711,11 @@ const SEG = 250;
 const LINES = {
   western: { key: 'stations',   curveMul: 1,    jerkMul: 1,    sky: null },
   central: { key: 'stations_c', curveMul: 1.3,  jerkMul: 1.05, sky: ['#2a2350', '#b0507a', '#ff9f6a', '#ffd38a'] },
-  harbour: { key: 'stations_h', curveMul: 0.9,  jerkMul: 1.15, sky: ['#123a5c', '#3f7fa6', '#f0a36b', '#ffd9a0'], water: true }
+  harbour: { key: 'stations_h', curveMul: 0.9,  jerkMul: 1.15, sky: ['#123a5c', '#3f7fa6', '#f0a36b', '#ffd9a0'], water: true },
+  transharbour: { key: 'stations_t', curveMul: 1.1, jerkMul: 1.12, sky: ['#3a1f4f', '#9c4f7a', '#f2a65a', '#ffe0a3'], water: true },
+  metro:   { key: 'stations_m', curveMul: 1.45, jerkMul: 0.92, sky: ['#0d1b3d', '#27407a', '#5a7fc0', '#a8c4f0'] } // sharp elevated curves, smoother rails
 };
-const LINE_ORDER = ['western', 'central', 'harbour'];
+const LINE_ORDER = ['western', 'central', 'harbour', 'transharbour', 'metro'];
 const curLine = () => (S.state === 'menu' || !S.line ? save.line : S.line);
 const lineStations = line => T(LINES[line || curLine()].key);
 const nSt = line => lineStations(line).length;
@@ -738,6 +752,8 @@ function festivalToday(d){
 }
 const FESTIVAL = festivalToday();
 const FEST_BONUS = FESTIVAL ? 1.2 : 1;
+// monsoon season (7 Jun - 30 Sep): rain events come twice as often
+const SEASON = (() => { const d = new Date(), md = (d.getMonth() + 1) * 100 + d.getDate(); return md >= 607 && md <= 930 ? 'monsoon' : null; })();
 // "Lean to choose": items offered on the left and right at each station
 const ITEMS = ['chai', 'paper', 'phones'];
 
@@ -779,8 +795,8 @@ function makeMission(seq){
 // every metre is 1 XP, every clutch save 15 XP; levels get a little longer each time and never run out
 const xpNeed = L => 200 + 100 * L;
 function passInfo(xp){ let L = 1, x = xp; while (x >= xpNeed(L) && L < 999) { x -= xpNeed(L); L++; } return { L, into: x, need: xpNeed(L) }; }
-const PASS_UNLOCK = { 3: { line: 'central' }, 5: { char: 'desai' }, 7: { line: 'harbour' }, 10: { char: 'sunita' }, 15: { char: 'ganesh' } };
-const LINE_LV = { western: 1, central: 3, harbour: 7 };
+const PASS_UNLOCK = { 3: { line: 'central' }, 5: { char: 'desai' }, 7: { line: 'harbour' }, 10: { char: 'sunita' }, 12: { line: 'transharbour' }, 15: { char: 'ganesh' }, 20: { line: 'metro' } };
+const LINE_LV = { western: 1, central: 3, harbour: 7, transharbour: 12, metro: 20 };
 const lineOpen = k => save.passLv >= LINE_LV[k] || (save.lineOpen || []).includes(k);
 const passReward = L => Object.assign({ coins: 30 + 10 * L }, PASS_UNLOCK[L] || {});
 function rankName(L){ return T(L >= 50 ? 'rank6' : L >= 30 ? 'rank5' : L >= 15 ? 'rank4' : L >= 7 ? 'rank3' : L >= 3 ? 'rank2' : 'rank1'); }
@@ -819,6 +835,11 @@ function xpTo(L){ let x = 0; for (let i = 1; i < L; i++) x += xpNeed(i); return 
 /* ================= Leaderboard (Supabase; see lb-config.js and store/leaderboard-setup.sql) ================= */
 const LB = window.MLS_LB || {};
 const lbOn = () => !!(LB.url && LB.key) && !SHOT;
+function weekKey(d){ // ISO week, e.g. 2026-W41
+  d = d || new Date(); const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = (t.getUTCDay() + 6) % 7;
+  t.setUTCDate(t.getUTCDate() - day + 3); const w1 = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+  return t.getUTCFullYear() + '-W' + String(1 + Math.round(((t - w1) / 864e5 - 3 + ((w1.getUTCDay() + 6) % 7)) / 7)).padStart(2, '0');
+}
 function newId(){ try { if (crypto.randomUUID) return crypto.randomUUID(); } catch(e){} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); }
 function lbFetchRaw(path, method, body, extra){
   const h = Object.assign({ apikey: LB.key, Authorization: 'Bearer ' + LB.key, 'Content-Type': 'application/json' }, extra || {});
@@ -827,18 +848,23 @@ function lbFetchRaw(path, method, body, extra){
 }
 function lbSubmit(){
   if (!lbOn() || !save.name) return;
-  lbFetchRaw('rpc/submit_score', 'POST', { p_id: save.pid, p_name: save.name, p_best: save.best, p_total: save.totals.dist, p_level: save.passLv }).catch(() => {});
+  const r = S.lastRide || { d: 0, s: 1 };
+  lbFetchRaw('rpc/submit_score', 'POST', { p_id: save.pid, p_name: save.name, p_best: save.best, p_total: save.totals.dist, p_level: save.passLv,
+    p_week: save.week.k, p_week_best: save.week.best, p_ride: r.d, p_secs: r.s }).catch(() => {});
 }
 async function lbLoad(board){
-  const col = board === 'total' ? 'total' : 'best', mine = board === 'total' ? save.totals.dist : save.best;
-  const rows = await (await lbFetchRaw('scores?select=name,best,total,level&order=' + col + '.desc&limit=50')).json();
-  const c = await lbFetchRaw('scores?select=best&' + col + '=gt.' + mine, 'HEAD', null, { Prefer: 'count=exact' });
+  const col = board === 'total' ? 'total' : board === 'week' ? 'week_best' : 'best', wk = board === 'week' ? '&week=eq.' + weekKey() : '';
+  const mine = board === 'total' ? save.totals.dist : board === 'week' ? (save.week.k === weekKey() ? save.week.best : 0) : save.best;
+  const rows = await (await lbFetchRaw('scores?select=name,best,total,level,week_best&order=' + col + '.desc&limit=50' + wk)).json();
+  const c = await lbFetchRaw('scores?select=best&' + col + '=gt.' + mine + wk, 'HEAD', null, { Prefer: 'count=exact' });
+  if (board === 'week') rows.forEach(r => { r.best = r.week_best; });
   return { rows, rank: 1 + (parseInt((c.headers.get('content-range') || '*/0').split('/')[1], 10) || 0) };
 }
 let lbBoard = 'best';
 function lbDemo(board){ // sample rows for screenshots and when offline
   const n = [['Priya', 2310, 41250, 24], ['Arjun', 1980, 38800, 22], ['Meera', 1640, 29120, 18], ['Kabir', 1210, 25400, 16], ['Sana', 990, 17330, 12]];
   const me = [save.name || T('you'), save.best, save.totals.dist, save.passLv, 1];
+  if (board === 'week') { n.forEach(r => { r[1] = Math.round(r[1] * 0.55); }); me[1] = save.week.k === weekKey() ? save.week.best : 0; }
   const all = n.concat([me]).sort((a, b) => board === 'total' ? b[2] - a[2] : b[1] - a[1]);
   return { rows: all.map(r => ({ name: r[0], best: r[1], total: r[2], level: r[3], me: r[4] })), rank: all.indexOf(me) + 1 };
 }
@@ -868,7 +894,8 @@ function renderLb(){
 /* ================= Save data ================= */
 const SAVE_KEY = 'mls_save_v2';
 const DEFAULT_SAVE = { best: 0, coins: 0, owned: ['rahul'], char: 'rahul',
-  settings: { sfx: true, music: true, vib: true, shake: true, hq: true, lang: '', voice: true, easy: false },
+  settings: { sfx: true, music: true, vib: true, shake: true, hq: true, lang: '', voice: true, easy: false, cbSafe: false, oneThumb: false, bigText: false, reduceMotion: false, shareStats: false, notif: true },
+  week: { k: '', best: 0 }, missionDay: '', shieldWeek: '', festClaim: '', installDay: '', allDoneDay: '',
   tutorialDone: false, missions: [], missionSeq: 0, totals: { dist: 0, runs: 0 },
   daily: { date: '', best: 0, rewarded: false, streak: 0 }, records: [],
   line: 'western', stand: 'middle', acc: '', accOwned: [], name: '', xp: -1, passLv: 0, pid: '',
@@ -896,6 +923,8 @@ function normalize(s){
   if (typeof d.xp !== 'number' || d.xp < 0) { d.xp = Math.max(0, d.totals.dist | 0); d.passLv = passInfo(d.xp).L; } // older saves: past distance counts as XP, no back-pay
   if (!d.passLv) d.passLv = passInfo(d.xp).L;
   if (!/^[0-9a-f-]{36}$/.test(d.pid)) d.pid = newId();
+  if (!d.week || typeof d.week !== 'object') d.week = { k: '', best: 0 };
+  if (!d.installDay) d.installDay = dayKey();
   return d;
 }
 function loadLocal(){
@@ -909,6 +938,10 @@ function loadLocal(){
 }
 let save = loadLocal();
 LANG = pickLang();
+function applyA11y(){
+  document.body.classList.toggle('bigtext', !!save.settings.bigText);
+  document.body.classList.toggle('reduce', !!save.settings.reduceMotion);
+}
 function persist(){
   if (SHOT) return;
   const j = JSON.stringify(save);
@@ -928,6 +961,8 @@ async function loadNative(){
   } catch(e){}
 }
 function refillMissions(){
+  if (save.missionDay !== dayKey()) { save.missionDay = dayKey(); save.missions = []; } // a fresh set of three every day
+  if (save.missions.length && save.missions.every(m => m.done) && save.allDoneDay !== dayKey()) { save.allDoneDay = dayKey(); save.coins += 100; banner(T('allDone'), T('coinsN', 100), '#1f9d55'); }
   save.missions = save.missions.filter(m => !m.done);
   let guard = 0;
   while (save.missions.length < 3 && guard++ < 50) {
@@ -1080,8 +1115,11 @@ function syncTouches(e){
   const live = new Set(); for (const t of e.touches) live.add(t.identifier);
   for (const id of touches.keys()) if (!live.has(id)) touches.delete(id);
 }
-function onTouchStart(e){ e.preventDefault(); ensureAudio(); if (S.state === 'replay') { endReplay(); return; } for (const t of e.changedTouches) { touches.set(t.identifier, sideOf(t.clientX)); touchT0.set(t.identifier, performance.now()); } syncTouches(e); }
-function onTouchMove(e){ e.preventDefault(); for (const t of e.changedTouches) if (touches.has(t.identifier)) touches.set(t.identifier, sideOf(t.clientX)); }
+function onTouchStart(e){ e.preventDefault(); ensureAudio(); if (S.state === 'replay') { endReplay(); return; } for (const t of e.changedTouches) { touchX0.set(t.identifier, t.clientX); touches.set(t.identifier, save.settings.oneThumb ? null : sideOf(t.clientX)); touchT0.set(t.identifier, performance.now()); } syncTouches(e); }
+const touchX0 = new Map();
+// one-thumb mode: touch anywhere, then slide left or right of where you touched
+function thumbSide(id, x){ const x0 = touchX0.get(id); if (x0 === undefined) return null; return x < x0 - 10 ? 'L' : x > x0 + 10 ? 'R' : touches.get(id) || null; }
+function onTouchMove(e){ e.preventDefault(); for (const t of e.changedTouches) if (touches.has(t.identifier)) touches.set(t.identifier, save.settings.oneThumb ? thumbSide(t.identifier, t.clientX) : sideOf(t.clientX)); }
 const touchT0 = new Map();
 function onTouchEnd(e){ e.preventDefault(); for (const t of e.changedTouches) { touches.delete(t.identifier); const t0 = touchT0.get(t.identifier); touchT0.delete(t.identifier); if (t0 && performance.now() - t0 < 220 && S.state === 'tutorial') S.tapWarn = 2.2; } syncTouches(e); }
 cv.addEventListener('touchstart', onTouchStart, { passive: false });
@@ -1106,6 +1144,7 @@ window.addEventListener('keydown', e => {
   if (k === 'ArrowLeft' || k === 'a' || k === 'A') { keys.L = true; e.preventDefault(); ensureAudio(); }
   else if (k === 'ArrowRight' || k === 'd' || k === 'D') { keys.R = true; e.preventDefault(); ensureAudio(); }
   else if (k === 'm' || k === 'M') toggleMute();
+  else if (k === 'e' || k === 'E') useAbility();
   else if (k === ' ' || k === 'Enter') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') return; // let the focused button handle it
     e.preventDefault();
@@ -1129,7 +1168,7 @@ function vib(ms){
 }
 
 /* ================= Audio ================= */
-let AC = null, master = null, sfxBus = null, musicBus = null, noiseBuf = null, rumbleGain = null, rumbleLevel = -1;
+let AC = null, master = null, sfxBus = null, musicBus = null, noiseBuf = null, rumbleGain = null, rumbleLevel = -1, murmurGain = null;
 let nextNoteTime = 0, step = 0;
 function ensureAudio(){
   if (SHOT) return;
@@ -1148,6 +1187,12 @@ function ensureAudio(){
     const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 240;
     rumbleGain = AC.createGain(); rumbleGain.gain.value = 0;
     src.connect(lp); lp.connect(rumbleGain); rumbleGain.connect(sfxBus); src.start();
+    // crowd murmur: band-passed noise with a slow, uneven swell, like a packed compartment talking
+    const ms = AC.createBufferSource(); ms.buffer = noiseBuf; ms.loop = true;
+    const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 520; bp.Q.value = 0.9;
+    murmurGain = AC.createGain(); murmurGain.gain.value = 0;
+    const lfo = AC.createOscillator(), lg = AC.createGain(); lfo.frequency.value = 0.23; lg.gain.value = 0.012; lfo.connect(lg); lg.connect(murmurGain.gain); lfo.start();
+    ms.connect(bp); bp.connect(murmurGain); murmurGain.connect(sfxBus); ms.start();
   }
   if (AC.state === 'suspended' && !document.hidden) AC.resume();
 }
@@ -1208,6 +1253,7 @@ function sfxCrash(){ if (!canPlay()) return; const t = AC.currentTime + 0.01;
 function setRumble(v){
   if (!rumbleGain || Math.abs(v - rumbleLevel) < 0.004) return;
   rumbleLevel = v; rumbleGain.gain.setTargetAtTime(v, AC.currentTime, 0.15);
+  if (murmurGain) murmurGain.gain.setTargetAtTime(v * 0.22, AC.currentTime, 0.4);
 }
 /* --- procedural dhol + shehnai-style music (Bhairav-flavoured scale) --- */
 const SCALE = [0, 1, 4, 5, 7, 8, 11, 12, 13, 16];
@@ -1283,7 +1329,7 @@ function reset(){
     grip: 100, exhausted: false, runCoins: 0, coinAcc: 0, steadyT: 0, nearArmed: false,
     jerks: 0, nears: 0, steadies: 0, chaiOk: 0, tunnels: 0,
     event: null, eventT: 0, eventTimer: curMod() && curMod().events ? grand(6, 9) : grand(16, 22), chaiSpilled: false, banner: null, grace: 0,
-    xpGiven: 0, continued: false, dailyDone: false, bankedDist: 0, bankedCoins: 0, runCounted: false, tutStep: 0, tutT: 0, previewChar: null, doneThisRun: [],
+    xpGiven: 0, walkers: [], continued: false, dailyDone: false, bankedDist: 0, bankedCoins: 0, runCounted: false, tutStep: 0, tutT: 0, previewChar: null, doneThisRun: [],
     nextJerkDir: gchance(0.5) ? -1 : 1, nextJerkMag: grand(38, 75), cued: false, cueK: 0, combo: 0, lastSaveT: -99, bestCombo: 0, danger: 0,
     freeze: 0, reliefT: 0, cheerT: 0, glare: null, glareT: 0, bubbles: [], offer: null, seatT: 0, calmT: 0, chaiT: 0, shield: false,
     rec: [], pendingSave: null, bestSave: null, trace: [], gaspArmed: true, shoutT: 0, replay: null, rideSecs: 0 });
@@ -1305,12 +1351,20 @@ function startGame(mode){
   refillMissions(); persist();
   if (!save.tutorialDone && !SHOT) { S.pendingMode = mode; startTutorial(); return; }
   S.state = 'playing'; $('pauseBtn').style.visibility = '';
+  S.abilCd = 6; S.abilT = 0; // first use after a few seconds
+  // adaptive difficulty: gentler after three quick falls in a row, tougher for players who ride long (not in seeded daily/challenge rides)
+  const rec = save.stats.recent.slice(-3).map(r => r[0]);
+  S.adapt = mode !== 'normal' || rec.length < 3 ? 1 : rec.every(x => x < 25) ? 0.85 : rec.every(x => x > 120) ? 1.1 : 1;
   $('hud').classList.remove('hidden'); $('skipTut').classList.add('hidden');
   hudCache = {};
   S.boardT = 2.2; S.boardName = stationName(0);
   popup(T('holdOn'), '#7df9ff', 34, H * 0.52);
   if (S.mode === 'challenge') banner(T('chTitle', S.challenge.n || T('aFriend')), T('chSub', S.challenge.d), '#0a84ff');
-  else if (FESTIVAL && S.mode !== 'daily') banner(T('fest_' + FESTIVAL), T('festSub'), '#ff9f0a');
+  else if (FESTIVAL && S.mode !== 'daily') {
+    const fk = FESTIVAL + new Date().getFullYear();
+    if (save.festClaim !== fk) { save.festClaim = fk; save.coins += 100; persist(); banner(T('fest_' + FESTIVAL), T('festGift'), '#ff9f0a'); } // once per festival per year
+    else banner(T('fest_' + FESTIVAL), T('festSub'), '#ff9f0a');
+  }
   if (S.mode === 'daily') banner(T('daily') + ': ' + T('mods')[S.mod.id].name, T('mods')[S.mod.id].desc, '#30d158');
   sfxHorn();
 }
@@ -1350,10 +1404,13 @@ function award(n, label){
 function arrive(){
   const name = stationName(S.level);
   S.boardT = 2.4; S.boardName = name; S.flash = 0.5;
-  sfxStation(); vib(20);
+  sfxStation(); vib([10, 60, 10, 60, 10]); // station: three soft taps
   award(20);
   speak(T('announce', name));
   makeOffer();
+  // people get off and on: two passers-by cross the aisle in opposite directions (visual only)
+  const kinds = ['office', 'girl', 'grandpa'], k1 = kinds[Math.random() * 2 | 0], k2 = Math.random() < 0.25 ? 'grandpa' : (k1 === 'office' ? 'girl' : 'office');
+  spawnWalker(k1, 1, 0.3, 0.2); spawnWalker(k2, -1, k2 === 'grandpa' ? 0.14 : 0.28, 0.9);
   startPush(-1, grand(70, 100) * Math.pow(diffFor(S.level + lvlOff()), 0.7), 0.8, T('chalo'));
 }
 function startPush(dir, mag, dur, label){
@@ -1369,6 +1426,7 @@ function jerk(dir, mag, fx, quiet){
   if (S.hang) S.hang.v -= dir * 90; COMMUTERS.forEach(cm => { if (cm.hang) cm.hang.v -= dir * 70; if (cm.feet) stumble(cm.feet, dir); });
   stumble(S.feet, dir);
   S.shake = Math.max(S.shake, 0.4); S.jerkFx = 1; S.jerkDir = dir;
+  vib(mag > 70 ? [35, 25, 45] : mag > 40 ? [28] : [14]); // the bigger the jerk, the heavier the buzz
   S.speedLines = [];
   for (let i = 0; i < 10; i++) S.speedLines.push({ y: rand(H * 0.16, H * 0.82), len: rand(0.25, 0.6), w: rand(1.5, 4) });
   if (!quiet) popup(JERK_WORDS[Math.random() * JERK_WORDS.length | 0], '#ffd23f', 36, H * 0.5);
@@ -1376,19 +1434,69 @@ function jerk(dir, mag, fx, quiet){
   spawn(sx, G.floorY - H * 0.02, 16, { dir: dir > 0 ? -0.5 : Math.PI + 0.5, spread: 0.6, v0: 160, v1: 420, colors: ['#ffd23f', '#ff8a1c', '#fff3b0'] });
   sfxThump(); vib(25);
 }
+/* ---------- Passers-by: people boarding at stations and crossing the aisle (Figma AI walk cycles) ---------- */
+const WALK = { office: ['office-w1', 'office-w2', 'office-w3', 'office-w2'], girl: ['girl-w1', 'girl-w2', 'girl-w3', 'girl-w2'],
+  grandpa: ['grandpa-w1', 'grandpa-w2', 'grandpa-w3', 'grandpa-w2'], kid: ['kid-r1', 'kid-r2', 'kid-r3', 'kid-r2'] };
+const WALK_H = { office: 1, girl: 0.94, grandpa: 0.86, kid: 0.62 }, WALK_FPS = { office: 7, girl: 7.5, grandpa: 3.6, kid: 12 };
+function spawnWalker(kind, dir, speed, delay){ (S.walkers || (S.walkers = [])).push({ kind, dir, x: dir > 0 ? -0.25 : 1.25, v: speed, t: -(delay || 0) }); }
+function updateWalkers(dt){
+  if (!S.walkers) return;
+  for (const w of S.walkers) { w.t += dt; if (w.t > 0) w.x += w.dir * w.v * dt; }
+  S.walkers = S.walkers.filter(w => w.x > -0.3 && w.x < 1.3);
+}
+function drawWalkers(){
+  if (!S.walkers || !S.walkers.length || !sprReady) return;
+  const base = G.floorY - G.winY1 * 0.95, by = G.floorY - H * 0.012;
+  for (const w of S.walkers) {
+    if (w.t < 0) continue;
+    const sp = SPR[WALK[w.kind][Math.floor(w.t * WALK_FPS[w.kind]) % 4]]; if (!sp || !artOk(sp.img)) continue;
+    const sc = base * WALK_H[w.kind] * 0.9 / sp.h, bob = Math.abs(Math.sin(w.t * WALK_FPS[w.kind] * Math.PI / 2)) * (w.kind === 'kid' ? 5 : 1.6);
+    ctx.save(); ctx.translate(w.x * W, by - bob); ctx.scale(w.dir, 1);
+    ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(0, bob, sp.w * sc * 0.32, 5, 0, 0, TAU); ctx.fill();
+    ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc); ctx.restore();
+  }
+}
+/* ---------- Abilities: one tap-to-use power per commuter, on a cooldown ---------- */
+const ABIL = {
+  rahul:  { dur: 0,   cd: 18 }, // Second wind: steadies you instantly and refills half your grip
+  desai:  { dur: 3.5, cd: 20 }, // Anchor: the train's push is less than half as strong
+  sunita: { dur: 5,   cd: 20 }, // Iron grip: grip does not drain
+  ganesh: { dur: 3.5, cd: 18 }  // Quick hands: steer 60% harder
+};
+const abilOn = k => S.abilT > 0 && heroKey() === k;
+function useAbility(){
+  if (S.state !== 'playing' || S.abilCd > 0) return;
+  const k = heroKey(), a = ABIL[k]; S.abilCd = a.cd; S.abilT = a.dur;
+  if (k === 'rahul') { S.grip = Math.min(100, S.grip + 50); S.tiltVel *= 0.3; S.exhausted = false; }
+  banner(T('abil_' + k), T('abilDo_' + k), '#f39c12'); sfxMission(); vib([20, 30, 20]);
+  spawn(G.cx, G.floorY - H * 0.25, 18, { spread: Math.PI * 2, v0: 80, v1: 260, g: 120, colors: ['#ffbb45', '#ffffff', '#f39c12'], kind: 'star' });
+  syncAbil();
+}
+function syncAbil(){
+  const b = $('abilBtn'); if (!b) return;
+  const show = S.state === 'playing'; b.classList.toggle('hidden', !show); if (!show) return;
+  const k = heroKey(), a = ABIL[k], ready = S.abilCd <= 0;
+  b.classList.toggle('ready', ready); b.classList.toggle('active', S.abilT > 0);
+  b.style.setProperty('--p', ready ? 1 : 1 - S.abilCd / a.cd);
+  $('abilName').textContent = T('abil_' + k);
+}
 /* ---------- Random ride events ---------- */
 const EVENTS = {
   tunnel:  { dur: 6,   title: 'TUNNEL!',      sub: 'Lights out. Trust the gauge.' },
   monsoon: { dur: 9,   title: 'MONSOON!',     sub: 'Wet strap: grip drains faster' },
   rush:    { dur: 3.6, title: 'DADAR RUSH!',  sub: 'Crowd surge incoming' },
   sleepy:  { dur: 7,   title: 'SLEEPY UNCLE', sub: 'He is leaning on you…' },
-  chai:    { dur: 4.6, title: 'CHAI! CHAI!',  sub: 'Stand straight to let him pass' }
+  chai:    { dur: 4.6, title: 'CHAI! CHAI!',  sub: 'Stand straight to let him pass' },
+  kid:     { dur: 2.8, title: 'WATCH OUT!',   sub: 'A schoolkid is racing through' },
+  grandpa: { dur: 8,   title: 'MAKE WAY',     sub: 'Stand straight while Dadaji passes' }
 };
 function startEvent(diff, forced){
   const pool = (curMod() && curMod().events) || Object.keys(EVENTS);
-  const keysE = pool.length > 1 ? pool.filter(k => k !== S.lastEvent) : pool;
+  let keysE = pool.length > 1 ? pool.filter(k => k !== S.lastEvent) : pool;
+  if (SEASON === 'monsoon' && keysE.includes('monsoon')) keysE = keysE.concat(['monsoon']);
   const k = forced || keysE[gRng() * keysE.length | 0], e = EVENTS[k];
-  S.event = k; S.lastEvent = k; S.eventT = 0; S.eventDur = e.dur; S.evSide = gchance(0.5) ? -1 : 1; S.chaiSpilled = false;
+  S.event = k; S.lastEvent = k; S.eventT = 0; S.eventDur = e.dur; S.evSide = gchance(0.5) ? -1 : 1; S.chaiSpilled = false; S.kidHit = false; S.bumped = false;
+  if (k === 'kid' || k === 'grandpa') spawnWalker(k, S.evSide, 1.5 / e.dur, 0); // crosses the aisle in exactly the event's length
   S.evMag = k === 'rush' ? grand(70, 95) * Math.pow(diff, 0.6) : k === 'sleepy' ? 38 * Math.pow(diff, 0.5) : 0;
   const sub = k === 'rush' ? T(S.evSide > 0 ? 'ev_rush_r' : 'ev_rush_l') : T('ev_' + k + '_s');
   banner(T('ev_' + k + '_t'), sub, k === 'tunnel' ? '#bf5af2' : k === 'monsoon' ? '#64d2ff' : k === 'chai' ? '#ff9f0a' : '#ff453a');
@@ -1400,6 +1508,7 @@ function endEvent(){
   if (k === 'chai') {
     if (!S.chaiSpilled) { S.chaiOk++; award(15 * ((curMod() && curMod().chaiBonus) || 1), T('chaiPassed')); }
   }
+  if (k === 'grandpa' && !S.bumped) award(15, T('grandpaOk'));
   S.event = null; S.evForce = 0; S.eventTimer = curMod() && curMod().every ? grand(...curMod().every) : grand(12, 20);
 }
 function updateEvent(dt, diff){
@@ -1413,6 +1522,8 @@ function updateEvent(dt, diff){
       S.chaiSpilled = true; popup(T('splash'), '#e0a46b', 24, H * 0.42);
       jerk(Math.sign(S.tilt) || 1, 25, true, true);
     }
+    if (S.event === 'kid' && p > 0.46 && !S.kidHit) { S.kidHit = true; jerk(S.evSide, 34, true, true); popup(T('kidBump'), '#ff9f0a', 24, H * 0.42); } // he brushes past you
+    if (S.event === 'grandpa' && p > 0.42 && p < 0.6 && Math.abs(S.tilt) > 15 && !S.bumped) { S.bumped = true; popup(T('grandpaBump'), '#e0a46b', 24, H * 0.42); vib(30); }
     if (S.eventT >= S.eventDur) endEvent();
   } else {
     S.eventTimer -= dt;
@@ -1480,11 +1591,20 @@ function showOver(){
   if (S.mode === 'daily' && !S.dailyDone) {
     S.dailyDone = true;
     const dly = save.daily, today = dayKey(), yesterday = dayKey(new Date(Date.now() - 864e5));
-    if (dly.date !== today) { dly.streak = dly.date === yesterday ? dly.streak + 1 : 1; dly.date = today; dly.best = 0; dly.rewarded = false; }
+    if (dly.date !== today) {
+      const twoAgo = dayKey(new Date(Date.now() - 2 * 864e5)), wk = weekKey();
+      if (dly.date === yesterday) dly.streak++;
+      else if (dly.date === twoAgo && dly.streak > 0 && save.shieldWeek !== wk) { save.shieldWeek = wk; dly.streak++; banner(T('shieldSaved'), T('shieldSub'), '#1e88e5'); } // one missed day forgiven per week
+      else dly.streak = 1;
+      dly.date = today; dly.best = 0; dly.rewarded = false;
+    }
     if (!dly.rewarded) { dly.rewarded = true; S.runCoins += DAILY_REWARD; banner(T('dailyReward'), '+' + DAILY_REWARD, '#30d158'); }
   }
   if (S.mode === 'daily') save.daily.best = Math.max(save.daily.best, Math.floor(S.dist));
   bankRun();
+  S.lastRide = { d: Math.floor(S.dist), s: Math.max(1, Math.round(S.playT)) };
+  if (save.week.k !== weekKey()) save.week = { k: weekKey(), best: 0 };
+  save.week.best = Math.max(save.week.best, Math.floor(S.dist));
   const totXp = Math.floor(S.dist) + 15 * S.nears + (S.mode === 'daily' ? 100 : 0), runXp = Math.max(0, totXp - S.xpGiven); S.xpGiven = Math.max(S.xpGiven, totXp); // safe after a second chance
   const gained = grantXp(runXp);
   save.records = save.records.filter(r => r.id !== S.runId);
@@ -1576,7 +1696,8 @@ function update(dt){
   }
   // first 25 s of a ride ramp up gently so new players get a real first ride
   const ramp = playing && S.level === 0 ? lerp(0.45, 1, clamp(S.playT / 40, 0, 1)) : 1;
-  const diff = playing ? diffFor(S.level + lvlOff()) * ramp : tut ? 0.35 : 0.75;
+  const diff = playing ? diffFor(S.level + lvlOff()) * ramp * (S.adapt || 1) : tut ? 0.35 : 0.75;
+  if (playing) { S.abilCd = Math.max(0, S.abilCd - dt); S.abilT = Math.max(0, S.abilT - dt); }
   S.speed = playing ? Math.min(12 + (S.level + lvlOff()) * 1.8, 32) : 11;
   if (playing) S.dist += S.speed * dt;
   if (S.grace > 0) S.grace -= dt;
@@ -1606,6 +1727,7 @@ function update(dt){
     S.brakeDone = S.level; startPush(1, grand(85, 120) * Math.pow(diff, 0.7), 0.9, T('brakes'));
   }
   if (playing) updateEvent(dt, diff);
+  updateWalkers(dt);
   const tf = tut && TUT[S.tutStep] ? TUT[S.tutStep].force : 0;
   const standMul = playing && save.stand === 'door' ? 1.15 : 1, easyMul = save.settings.easy ? 0.8 : 1;
   S.force = (sway + S.curve + S.push + S.evForce) * (S.grace > 0 ? 0.35 : 1) * (S.calmT > 0 ? 0.55 : 1) * standMul * easyMul + tf;
@@ -1624,7 +1746,7 @@ function update(dt){
   // --- grip stamina ---
   if (playing || tut) {
     const holding = dir !== 0 || both;
-    if (holding && !S.exhausted && S.seatT <= 0) S.grip -= (both ? 15 : 8) * ch.grip * (S.event === 'monsoon' ? 1.6 : 1) * (S.chaiT > 0 ? 0.5 : 1) * dt;
+    if (holding && !S.exhausted && S.seatT <= 0 && !abilOn('sunita')) S.grip -= (both ? 15 : 8) * ch.grip * (S.event === 'monsoon' ? 1.6 : 1) * (S.chaiT > 0 ? 0.5 : 1) * dt;
     else S.grip += (S.seatT > 0 ? 60 : 24) * dt;
     S.grip = clamp(S.grip, tut ? 25 : 0, 100);
     if (S.grip <= 0 && !S.exhausted) { S.exhausted = true; popup(T('gripSlip'), '#4cc9f0', 26, H * 0.44); vib(40); }
@@ -1634,9 +1756,9 @@ function update(dt){
   S.inDir = dir; S.both = both;
 
   // --- balance physics: inverted-pendulum lean with damping ---
-  const ctrl = (235 + S.level * 9) * ch.ctrl * dir;
-  const damp = (both ? 4.8 : 2.4) * ch.damp;
-  const acc = S.force * ch.fm + ctrl + S.tilt * 1.6 - S.tiltVel * damp;
+  const ctrl = (235 + S.level * 9) * ch.ctrl * dir * (abilOn('ganesh') ? 1.6 : 1);
+  const damp = (both ? 4.8 : 2.4) * ch.damp * (abilOn('ganesh') ? 1.3 : 1);
+  const acc = S.force * ch.fm * (abilOn('desai') ? 0.45 : 1) + ctrl + S.tilt * 1.6 - S.tiltVel * damp;
   S.tiltVel += acc * dt; S.tilt += S.tiltVel * dt;
   if (S.seatT > 0) { S.tilt *= Math.max(0, 1 - dt * 6); S.tiltVel *= Math.max(0, 1 - dt * 8); } // sitting: nothing to balance
   if (S.state === 'menu') S.tilt = clamp(S.tilt, -30, 30);
@@ -1663,7 +1785,7 @@ function update(dt){
     if (a < 12) { S.steadyT += dt; if (S.steadyT >= 5) { S.steadyT = 0; S.steadies++; award(5, T('steady')); } } else S.steadyT = 0;
     if (a > LIM() - 9) S.nearArmed = true;
     if (S.nearArmed && a < LIM() - 17) { // CLUTCH SAVE: back-to-back saves within 12 s build a combo
-      S.nearArmed = false; S.nears++;
+      S.nearArmed = false; S.nears++; vib([10, 30, 10, 30, 30]);
       S.combo = S.t - S.lastSaveT < 12 ? S.combo + 1 : 1; S.lastSaveT = S.t; S.bestCombo = Math.max(S.bestCombo, S.combo);
       award(10 * S.combo, S.combo > 1 ? T('clutch') + '  \u00D7' + S.combo : T('clutch'));
       sfxSave(S.combo); sfxSigh(); vib(35); S.flash = Math.max(S.flash, 0.2);
@@ -1727,6 +1849,7 @@ function makeOffer(){
   const sides = gchance(0.5) ? [a, b] : [b, a];
   if (S.level % 3 === 0) sides[gchance(0.5) ? 0 : 1] = 'seat';
   S.offer = { L: sides[0], R: sides[1], t: 0, dur: 5, pL: 0, pR: 0 };
+  save.offersSeen = (save.offersSeen || 0) + 1;
   sfxCue();
 }
 function takeItem(item){
@@ -1849,8 +1972,14 @@ async function sendChallenge(){
   window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank');
 }
 // --- playtest recorder (stays on the device; copy it from Records) ---
+function sendStats(secs){ // opt-in only; no name, no id, nothing that identifies the player
+  if (!save.settings.shareStats || !lbOn()) return;
+  const days = Math.round((new Date(dayKey()) - new Date(save.installDay)) / 864e5);
+  lbFetchRaw('rides', 'POST', { secs, dist: Math.floor(S.dist), saves: S.nears, line: S.line, mode: S.mode, chr: heroKey(), days_since_install: days, ver: '1.4' }).catch(() => {});
+}
 function logRide(){
   const st = save.stats, secs = Math.round(S.rideSecs || S.playT);
+  sendStats(secs);
   if (!st.rides) st.firstRide = secs;
   st.rides++; st.secs += secs; st.saves += S.nears;
   st.recent.push([secs, Math.floor(S.dist), S.nears, S.line[0] || 'w', save.settings.easy ? 1 : 0]); if (st.recent.length > 50) st.recent.shift();
@@ -2050,7 +2179,7 @@ function limb(x0, y0, x1, y1, x2, y2, w0, w1, c0, c1){
 }
 /* ---------- Illustrated assets generated with Figma AI (see art/figma and tools/process_art.py) ---------- */
 const ART = {};
-for (const n of ['bench', 'rack', 'fan', 'poster-chai', 'poster-vadapav', 'poster-sea']) { const im = new Image(); im.src = 'art/' + n + '.webp'; ART[n] = im; }
+for (const n of ['bench', 'rack', 'fan', 'poster-chai', 'poster-vadapav', 'poster-sea', 'arm-chai', 'arm-paper', 'arm-phones', 'arm-seat']) { const im = new Image(); im.src = 'art/' + n + '.webp'; ART[n] = im; }
 const artOk = im => !!(im && im.complete && im.naturalWidth > 0);
 /* ---------- Ink style (Mario Miranda-inspired: confident black outlines, hatching, round-nosed caricatures) ---------- */
 const INK = '#1d1611';
@@ -2480,7 +2609,32 @@ function drawIcon(kind, x, y, r){
   }
   ctx.restore();
 }
+// station offers as part of the world: an arm reaches in from the screen edge holding the item (Figma AI art).
+// Leaning toward it pulls it closer; text appears only for a player's first few offers.
 function drawOffer(){
+  const o = S.offer; if (!o || S.state !== 'playing') return;
+  if (!['L', 'R'].every(s2 => artOk(ART['arm-' + o[s2]]))) return drawOfferIcons();
+  const k = clamp(Math.min(o.t / 0.45, (o.dur - o.t) / 0.45), 0, 1), need = 0.9, teach = (save.offersSeen || 0) <= 3;
+  for (const [side, item, prog] of [[-1, o.L, o.pL], [1, o.R, o.pR]]) {
+    const im = ART['arm-' + item], aw = Math.min(W * 0.54, 300 * G.u + 70), ah = aw * im.naturalHeight / im.naturalWidth;
+    const pull = Math.min(1, prog / need), reach = aw * (0.74 * easeOut(k) + 0.14 * pull) - aw;  // slides in, then reaches further as you lean
+    const y = H * 0.56 + Math.sin(S.t * 2.2 + side) * 3 * G.u - ah / 2;
+    ctx.save(); ctx.globalAlpha = Math.min(1, k * 1.4);
+    if (side > 0) { ctx.translate(W, 0); ctx.scale(-1, 1); }
+    ctx.translate(reach, y); ctx.rotate(Math.sin(S.t * 1.7 + side) * 0.02 - pull * 0.04);
+    if (pull > 0) { const hx = aw * 0.84, hy = ah * 0.45; const g = ctx.createRadialGradient(hx, hy, 4, hx, hy, ah * 0.75); g.addColorStop(0, `rgba(255,214,10,${0.55 * pull})`); g.addColorStop(1, 'rgba(255,214,10,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hx, hy, ah * 0.75, 0, TAU); ctx.fill(); }
+    ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6; // lifts the arm off the busy carriage
+    ctx.drawImage(im, 0, 0, aw, ah);
+    ctx.restore();
+    if (teach) { // first offers only: a small name tag under the hand
+      const hx = side < 0 ? reach + aw * 0.8 : W - reach - aw * 0.8, ty = y + ah + 14, label = (side < 0 ? '\u25C0 ' : '') + T('item_' + item) + (side > 0 ? ' \u25B6' : '');
+      ctx.save(); ctx.globalAlpha = k; ctx.font = `700 ${Math.round(6 * G.u + 7)}px ${FONT}`; const tw = ctx.measureText(label).width + 18;
+      ctx.fillStyle = 'rgba(20,20,20,.72)'; ctx.beginPath(); rr(ctx, hx - tw / 2, ty - 11, tw, 22, 11); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, hx, ty + 1); ctx.restore();
+    }
+  }
+}
+function drawOfferIcons(){
   const o = S.offer; if (!o || S.state !== 'playing') return;
   const k = clamp(Math.min(o.t / 0.3, (o.dur - o.t) / 0.3), 0, 1), r = 30 * G.u + 10, y = H * 0.4;
   for (const [side, item, prog] of [[-1, o.L, o.pL], [1, o.R, o.pR]]) {
@@ -2697,7 +2851,7 @@ function drawPlayerSprite(){
     ctx.save(); ctx.translate(fx, fy); ctx.rotate(th); ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
     ctx.restore();
   } else {
-    const ho = { key: pk, heroKey: key, acc: save.acc, jit: mood === 'panic' ? (Math.random() - 0.5) * 1.6 : 0, bob: mood === 'relief' ? -Math.abs(Math.sin(S.t * 10)) * 3 : 0 };
+    const ho = { key: pk, heroKey: key, acc: save.acc, jit: mood === 'panic' ? (Math.random() - 0.5) * 1.6 : 0, bob: mood === 'relief' ? -Math.abs(Math.sin(S.t * 10)) * 3 : Math.sin(S.t * 1.5) * 1.2 * G.u }; // breathing idle
     drawHanger(sp, sc, fx, fy, th, 1, S.hang, ho, S.feet || (S.feet = newFeet()));
     if (ho.head) { S.headX = ho.head[0]; S.headY = ho.head[1]; }
   }
@@ -2716,7 +2870,7 @@ function drawCommuterSprites(){
     const flip = idx >= 2 ? -1 : 1, sc = neighScale(set), ang = commuterAng(cm, idx);
     const bx = cm.x * W, by = G.floorY - H * 0.012;
     ctx.save(); ctx.beginPath(); ctx.ellipse(bx, by + 3, G.tw * 0.55, G.tw * 0.11, 0, 0, TAU); ctx.clip(); hatchRect(bx - G.tw, by - G.tw, G.tw * 2, G.tw * 2, 0.55); ctx.restore();
-    const ho = { key: k }; drawHanger(sp, sc, bx, by, ang, flip, cm.hang, ho, cm.feet || (cm.feet = newFeet()));
+    const ho = { key: k, bob: Math.sin(S.t * 1.6 + idx * 1.7) * 1.4 * G.u + (cheering ? -Math.abs(Math.sin(S.t * 11 + idx)) * 3 : 0) }; drawHanger(sp, sc, bx, by, ang, flip, cm.hang, ho, cm.feet || (cm.feet = newFeet()));
     if (ho.head) { cm.hx = ho.head[0]; cm.hy = ho.head[1]; } else { cm.hx = bx; cm.hy = by - sp.h * sc * 0.8; }
     if (idx === sleeper) { ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.font = `700 ${Math.round(14 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'center'; const zy = cm.hy - G.headR * 1.4 - Math.sin(S.t * 3) * 4; ctx.strokeText('Zzz', cm.hx, zy); ctx.fillText('Zzz', cm.hx, zy); }
   });
@@ -2843,7 +2997,8 @@ function drawGauge(){
   ctx.beginPath(); ctx.arc(cx, cy, R + lw + 9, Math.PI, TAU); ctx.lineTo(cx + R + lw + 9, cy + 24); ctx.lineTo(cx - R - lw - 9, cy + 24); ctx.closePath(); ctx.fill();
   ctx.lineCap = 'round'; ctx.lineWidth = lw;
   const seg = (a0, a1, c) => { ctx.strokeStyle = c; ctx.beginPath(); ctx.arc(cx, cy, R, ang(a0) + 0.035, ang(a1) - 0.035); ctx.stroke(); };
-  seg(-45, -35, '#ff453a'); seg(-35, -25, '#ffd60a'); seg(-25, 25, '#30d158'); seg(25, 35, '#ffd60a'); seg(35, 45, '#ff453a');
+  const [cG, cY, cR] = save.settings.cbSafe ? ['#1e88e5', '#ffb300', '#d81b60'] : ['#30d158', '#ffd60a', '#ff453a']; // blue/amber/magenta reads for every colour-vision type
+  seg(-45, -35, cR); seg(-35, -25, cY); seg(-25, 25, cG); seg(25, 35, cY); seg(35, 45, cR);
   const gR = R * 0.68, gp = S.grip / 100, low = S.exhausted || S.grip < 25;
   const gcol = low ? (Math.sin(S.t * 16) > 0 ? '#ff453a' : '#ff9f9a') : '#64d2ff';
   ctx.lineWidth = Math.max(3, lw * 0.45); ctx.strokeStyle = 'rgba(255,255,255,.12)';
@@ -2851,7 +3006,7 @@ function drawGauge(){
   if (gp > 0.01) { ctx.strokeStyle = gcol; ctx.beginPath(); ctx.arc(cx, cy, gR, Math.PI, Math.PI + Math.PI * gp); ctx.stroke(); }
   ctx.fillStyle = gcol; ctx.font = `600 ${Math.round(R * 0.08 + 6)}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(T('grip'), cx - gR, cy + 12);
-  const at = Math.abs(S.tilt), col = at < 25 ? '#30d158' : at < 35 ? '#ffd60a' : '#ff453a', na = ang(clamp(S.tilt, -48, 48));
+  const at = Math.abs(S.tilt), col = at < 25 ? cG : at < 35 ? cY : cR, na = ang(clamp(S.tilt, -48, 48));
   ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2.5;
   ctx.beginPath(); ctx.moveTo(cx + Math.cos(na) * R * 0.22, cy + Math.sin(na) * R * 0.22); ctx.lineTo(cx + Math.cos(na) * (R - lw * 0.8), cy + Math.sin(na) * (R - lw * 0.8)); ctx.stroke();
   ctx.fillStyle = col; ctx.beginPath(); ctx.arc(cx + Math.cos(na) * R, cy + Math.sin(na) * R, lw * 0.85, 0, TAU); ctx.fill();
@@ -2933,13 +3088,13 @@ function drawTutorial(){
 }
 function render(){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  const shk = save.settings.shake ? S.shake * 14 * G.u : 0;
+  const shk = save.settings.shake && !save.settings.reduceMotion ? S.shake * 14 * G.u : 0;
   const ox = (Math.random() * 2 - 1) * shk, oy = (Math.random() * 2 - 1) * shk * 0.6;
   const roll = save.settings.shake ? clamp(S.force * 0.00022, -0.035, 0.035) : 0;
-  const z = 1 + 0.04 * S.danger; // push in on the player at the edge
+  const z = save.settings.reduceMotion ? 1 : 1 + 0.04 * S.danger; // push in on the player at the edge
   ctx.save();
   ctx.translate(W / 2 + ox, H * 0.55 + oy); ctx.rotate(roll); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.55);
-  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); const aw = artWait(); if (!drawCommuterSprites() && !aw) drawCommuters(); if (!drawChaiwalaSprite() && !aw) drawChaiwala(); drawGhost(); if (!drawPlayerSprite() && !aw) drawPlayer(); drawForeground(); drawBubbles();
+  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); const aw = artWait(); if (!drawCommuterSprites() && !aw) drawCommuters(); if (!drawChaiwalaSprite() && !aw) drawChaiwala(); drawWalkers(); drawGhost(); if (!drawPlayerSprite() && !aw) drawPlayer(); drawForeground(); drawBubbles();
   if (S.event === 'tunnel') { ctx.fillStyle = `rgba(10,5,25,${0.4 * evK()})`; ctx.fillRect(-80, -80, W + 160, H + 160); }
   ctx.restore();
   drawFx(); drawOffer(); drawBuffs(); drawBoard(); drawBanner(); drawTutorial(); if (S.state !== 'replay') { drawGauge(); drawTouchHints(); } drawReplayHud();
@@ -2949,6 +3104,7 @@ function render(){
 let hudCache = {};
 function setHud(id, val){ if (hudCache[id] !== val) { hudCache[id] = val; $(id).textContent = val; } }
 function updateHud(){
+  syncAbil();
   if (S.state !== 'playing') return;
   const d = Math.floor(S.dist);
   setHud('stLbl', (S.mode === 'daily' ? T('dailyTag') + ' \u00B7 ' : '') + T('nextStop'));
@@ -3015,7 +3171,7 @@ function applyI18n(){
   refreshMenus();
 }
 function renderMissions(){ const l = $('mlist'); l.innerHTML = ''; for (const m of save.missions) l.appendChild(missionEl(m)); }
-const SETTINGS = ['sfx', 'music', 'voice', 'vib', 'shake', 'hq', 'easy'];
+const SETTINGS = ['sfx', 'music', 'voice', 'vib', 'shake', 'hq', 'easy', 'cbSafe', 'oneThumb', 'bigText', 'reduceMotion', 'shareStats', 'notif'];
 function renderSettings(){
   const box = $('setrows'); box.innerHTML = '';
   const lrow = document.createElement('div'); lrow.className = 'setrow';
@@ -3030,12 +3186,14 @@ function renderSettings(){
   ni.addEventListener('keydown', e => e.stopPropagation());
   nrow.append(nl, ni); box.appendChild(nrow);
   for (const k of SETTINGS) {
+    if (k === 'notif' && !isNative()) continue; // reminders need the phone app
     const row = document.createElement('div'); row.className = 'setrow';
     const s = document.createElement('span'); s.textContent = T(k);
     const b = document.createElement('button'); b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', String(!!save.settings[k])); b.setAttribute('aria-label', T(k)); b.className = 'tog' + (save.settings[k] ? ' on' : ''); b.textContent = save.settings[k] ? T('on') : T('off');
     b.addEventListener('click', () => {
       save.settings[k] = !save.settings[k]; persist(); ensureAudio(); applyAudio();
       if (k === 'hq') layout();
+      applyA11y(); if (k === 'notif') scheduleReminders();
       if (k === 'voice' && save.settings.voice) speak(T('announce', stationName(2)));
       if (k === 'vib' && save.settings.vib) vib(30);
       renderSettings();
@@ -3112,8 +3270,9 @@ function renderChars(focusKey){
     if (cur) { const b = document.createElement('span'); b.className = 'badge2'; b.textContent = T('riding'); art.appendChild(b); }
     if (!owned) art.insertAdjacentHTML('beforeend', '<span class="lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg></span>');
     const body = document.createElement('div'); body.className = 'body';
-    body.innerHTML = '<span class="nm"></span><span class="rl"></span><div class="abil"><i><span>E</span></i><span><b></b><small></small></span></div>';
-    body.querySelector('.nm').textContent = tx.name; body.querySelector('.rl').textContent = tx.role; body.querySelector('.abil b').textContent = T('abil_' + k); body.querySelector('.abil small').textContent = tx.desc;
+    body.innerHTML = '<span class="nm"></span><span class="rl"></span><span class="ds"></span><div class="abil"><i><span>E</span></i><span><b></b><small></small></span></div>';
+    body.querySelector('.nm').textContent = tx.name; body.querySelector('.rl').textContent = tx.role; body.querySelector('.ds').textContent = tx.desc;
+    body.querySelector('.abil b').textContent = T('abil_' + k); body.querySelector('.abil small').textContent = T('abilDo_' + k) + ' \u00B7 ' + T('abilCd', ABIL[k].cd);
     for (const [lbl, fn] of Object.entries(STAT_FN)) { const r = document.createElement('div'); r.className = 'stat'; r.innerHTML = '<span></span><i><b></b></i>'; r.querySelector('span').textContent = T(lbl); r.querySelector('b').style.width = Math.round(fn(c) * 100) + '%'; body.appendChild(r); }
     const cta = document.createElement('button'); cta.className = 'cta';
     if (cur) { cta.textContent = T('riding'); cta.classList.add('cur'); }
@@ -3166,6 +3325,7 @@ function countUp(el, target, suffix){
   requestAnimationFrame(tick);
 }
 function celebrate(){ // confetti burst across the top of the scene
+  if (save.settings.reduceMotion) { sfxMission(); vib([20, 40, 20]); return; }
   for (let i = 0; i < 4; i++) spawn(W * (0.15 + i * 0.23), H * 0.08, 22, { dir: Math.PI / 2, spread: 1.2, v0: 80, v1: 360, g: 380, colors: ['#ffd60a', '#ff453a', '#30d158', '#64d2ff', '#ff9f0a', '#ffffff'], kind: 'star' });
   sfxMission(); vib([20, 40, 20]);
 }
@@ -3212,23 +3372,32 @@ function openPanel(id){ $(id).classList.remove('hidden'); syncSheetOpen(); }
 function closePanel(id){ $(id).classList.add('hidden'); syncSheetOpen(); }
 
 /* ---------- Share card ---------- */
+// 1080x1920 story card (Instagram / WhatsApp status): the illustrated commuter, the distance and the station
+async function storyCard(d, st){
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; const x = c.getContext('2d');
+  x.fillStyle = '#f4f4f4'; x.fillRect(0, 0, 1080, 1920);
+  const g = x.createLinearGradient(0, 0, 0, 1100); g.addColorStop(0, '#ffbb45'); g.addColorStop(1, '#f39c12'); x.fillStyle = g; x.fillRect(0, 0, 1080, 1100);
+  x.fillStyle = 'rgba(255,255,255,.18)'; for (let i = 0; i < 9; i++) { x.beginPath(); x.arc(160 + i * 110, 210 + (i % 2) * 40, 26, 0, TAU); x.fill(); }
+  const img = new Image(); img.src = 'art/char-' + heroKey() + '.webp';
+  await new Promise(r => { img.onload = img.onerror = r; });
+  if (img.naturalWidth) { const h = 880, w = h * img.naturalWidth / img.naturalHeight; x.drawImage(img, 540 - w / 2, 1100 - h, w, h); }
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = `700 84px ${FONT}`; x.fillStyle = '#fff'; x.fillText('Mumbai Local', 540, 130);
+  x.fillStyle = '#fff'; x.beginPath(); rr(x, 60, 1040, 960, 640, 56); x.fill();
+  x.font = `700 40px ${FONT}`; x.fillStyle = '#d97c00'; x.fillText(T('cardLine').toUpperCase(), 540, 1130, 900);
+  x.font = `700 190px ${FONT}`; x.fillStyle = '#141414'; x.fillText(d + ' m', 540, 1290);
+  x.font = `700 56px ${FONT}`; x.fillStyle = '#6b6b6b'; x.fillText(st, 540, 1430, 900);
+  x.fillStyle = '#f39c12'; x.beginPath(); rr(x, 240, 1520, 600, 110, 55); x.fill();
+  x.font = `700 46px ${FONT}`; x.fillStyle = '#fff'; x.fillText(T('cardBeat'), 540, 1576, 560);
+  x.font = `600 38px ${FONT}`; x.fillStyle = '#6b6b6b'; x.fillText((GAME_URL || 'mumbailocalgame.github.io').replace(/^https?:\/\//, ''), 540, 1800);
+  return c;
+}
 async function shareScore(){
   const d = Math.floor(S.dist), st = stationName(S.level);
   const text = T('shareText', d, st) + ' #MumbaiLocalStraphanger' + (GAME_URL ? ' ' + GAME_URL : '');
   const Sh = cap('Share');
-  if (Sh) { try { await Sh.share({ title: 'Mumbai Local Straphanger', text, dialogTitle: 'Share your ride' }); } catch(e){} return; }
-  const c = document.createElement('canvas'); c.width = 1080; c.height = 1080; const x = c.getContext('2d');
-  const g = x.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, '#5b2185'); g.addColorStop(1, '#1a0b26'); x.fillStyle = g; x.fillRect(0, 0, 1080, 1080);
-  for (let i = -1080; i < 1080; i += 40) { x.fillStyle = (i / 40) % 2 ? '#ffc62b' : '#1a0b26'; x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 20, 0); x.lineTo(i + 20 + 30, 30); x.lineTo(i + 30, 30); x.fill(); x.beginPath(); x.moveTo(i, 1050); x.lineTo(i + 20, 1050); x.lineTo(i + 50, 1080); x.lineTo(i + 30, 1080); x.fill(); }
-  x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.font = `700 92px ${FONT}`; x.fillStyle = '#ff3d7f'; x.fillText('MUMBAI LOCAL', 546, 186); x.fillStyle = '#ffc62b'; x.fillText('MUMBAI LOCAL', 540, 180);
-  x.font = `700 48px ${FONT}`; x.fillStyle = '#fff'; x.fillText('STRAPHANGER', 540, 260);
-  x.font = `700 46px ${FONT}`; x.fillStyle = '#e8d8f5'; x.fillText(T('cardLine'), 540, 400, 980);
-  x.font = `700 76px ${FONT}`; const tw = Math.min(980, x.measureText(st.toUpperCase()).width + 90);
-  x.fillStyle = '#ffd400'; x.fillRect(540 - tw / 2, 450, tw, 130); x.strokeStyle = '#111'; x.lineWidth = 8; x.strokeRect(540 - tw / 2 + 12, 462, tw - 24, 106);
-  x.fillStyle = '#111'; x.fillText(st.toUpperCase(), 540, 518, tw - 60);
-  x.font = `700 150px ${FONT}`; x.fillStyle = '#fff'; x.fillText(d + ' m', 540, 730);
-  x.font = `700 40px ${FONT}`; x.fillStyle = '#ffc62b'; x.fillText(T('cardBeat'), 540, 870, 980);
+  if (Sh && !navigator.canShare) { try { await Sh.share({ title: 'Mumbai Local Straphanger', text, dialogTitle: 'Share your ride' }); } catch(e){} return; }
+  const c = await storyCard(d, st);
   const blob = await new Promise(r => c.toBlob(r, 'image/png'));
   try {
     const file = new File([blob], 'mumbai-local-score.png', { type: 'image/png' });
@@ -3239,6 +3408,20 @@ async function shareScore(){
   setTimeout(() => URL.revokeObjectURL(a.href), 3000); toast(T('cardSaved'));
 }
 
+/* ================= Daily reminder (native app; no server needed) ================= */
+async function scheduleReminders(){
+  const N = cap('LocalNotifications'); if (!N || !isNative() || SHOT) return;
+  try {
+    await N.cancel({ notifications: [{ id: 101 }, { id: 102 }] });
+    if (!save.settings.notif) return;
+    const perm = await N.requestPermissions(); if (perm.display !== 'granted') return;
+    const at = h => { const d = new Date(); d.setHours(h, 0, 0, 0); if (d <= new Date()) d.setDate(d.getDate() + 1); return d; };
+    await N.schedule({ notifications: [
+      { id: 101, title: T('notifTitle'), body: T('notifBody'), schedule: { at: at(18), every: 'day', allowWhileIdle: true } },
+      { id: 102, title: T('notifStreakTitle'), body: T('notifStreakBody', save.daily.streak), schedule: { at: at(21), every: 'day', allowWhileIdle: true } }
+    ] });
+  } catch(e){}
+}
 /* ================= Rewarded ads (AdMob, native app only) ================= */
 // TEST ad units from Google. Replace with your own AdMob unit IDs and set testing:false for release (see README).
 const ADS_CFG = { testing: true, rewarded: { android: 'ca-app-pub-3940256099942544/5224354917', ios: 'ca-app-pub-3940256099942544/1712485313' } };
@@ -3294,6 +3477,7 @@ const on = (id, fn) => $(id).addEventListener('click', e => { ensureAudio(); sfx
 on('heroCard', () => startGame('normal'));
 on('dailyBtn', () => startGame('daily'));
 on('recordsBtn', () => { renderRecords(); openPanel('records'); });
+$('abilBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); ensureAudio(); useAbility(); });
 on('passBtn', () => { ensureAudio(); sfxTap(); renderPass(); openPanel('pass'); });
 on('passClose', () => closePanel('pass'));
 document.querySelectorAll('#lbSeg button').forEach(b => b.addEventListener('click', () => { ensureAudio(); sfxTap(); lbBoard = b.dataset.b; renderLb(); }));
@@ -3370,10 +3554,13 @@ if (window.ResizeObserver) new ResizeObserver(layout).observe(game);
   adsInit();
 })();
 S.challenge = readChallenge();
-layout(); applyI18n(); tickLed();
+layout(); applyI18n(); applyA11y(); scheduleReminders(); tickLed();
 function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
   save.tutorialDone = true;
   const sc = new URLSearchParams(location.search).get('c'); if (CHARS[sc]) { save.char = sc; save.owned = CHAR_ORDER.slice(); }
+  const qp = new URLSearchParams(location.search), ln = qp.get('line'); if (LINES[ln]) { save.line = ln; save.passLv = 30; }
+  if (qp.get('cb')) save.settings.cbSafe = true;
+  if (SHOT === 'card') { storyCard(1240, 'Andheri').then(c => { document.body.innerHTML = ''; c.style.cssText = 'width:100vw;height:auto;display:block'; document.body.style.cssText = 'overflow:auto;position:static;background:#000'; document.body.appendChild(c); }); return; }
   const sl = new URLSearchParams(location.search).get('lang'); if (LANGS.includes(sl)) { LANG = sl; applyI18n(); }
   if (SHOT === 'daily') { S.autopilot = true; startGame('daily'); }
   if (SHOT === 'clutch') { S.autopilot = true; S.clutchDemo = true; startGame(); S.dist = 120; }
@@ -3390,7 +3577,8 @@ function runShot(){ // deterministic states for store screenshots (waits for the
   if (SHOT === 'over') setTimeout(() => { S.dist = 1240; S.level = 4; S.runCoins = 168; gameOver(); }, 400);
   if (SHOT === 'chars') { save.coins = 650; save.owned = ['rahul', 'desai']; S.previewChar = 'sunita'; $('charsBtn').click(); S.previewChar = 'sunita'; renderChars(); }
   if (SHOT === 'tut') { save.tutorialDone = false; hideOverlays(); startTutorial(); }
-  if (SHOT === 'event' || SHOT === 'chai') { S.dist = 60; setTimeout(() => startEvent(1, SHOT === 'chai' ? 'chai' : 'monsoon'), 300); }
+  if (SHOT === 'event' || SHOT === 'chai') { S.dist = 60; setTimeout(() => startEvent(1, SHOT === 'chai' ? 'chai' : (new URLSearchParams(location.search).get('ev') || 'monsoon')), 300); }
+  if (SHOT === 'board') { S.autopilot = true; startGame(); S.dist = SEG - 8; }
 }
 if (SHOT) { const t0 = Date.now(); (function wait(){ if (sprReady || Date.now() - t0 > 8000) runShot(); else setTimeout(wait, 50); })(); }
 requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
