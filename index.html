@@ -131,7 +131,7 @@ body.sheet-open #muteBtn{display:none}
 .grabber{width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:2px auto 10px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .sheet-head h2{font-size:22px;font-weight:700;letter-spacing:-.015em}
-.done{color:var(--accent);font-size:17px;font-weight:600;padding:4px 0}
+button.done{color:var(--accent);font-size:17px;font-weight:600;padding:4px 0}
 .sheet-sub{font-size:14px;color:var(--text2);margin:-6px 0 12px;font-weight:600}
 .group{background:var(--surface2);border-radius:12px;overflow:hidden;margin-bottom:16px}
 .setrow{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:46px;padding:0 14px;font-size:16px;text-align:left}
@@ -389,9 +389,9 @@ html,body{color:var(--text)}
 .grabber{background:var(--text3)}
 .sheet-head{justify-content:center;position:relative;margin-bottom:16px}
 .sheet-head h2{background:var(--tab);color:var(--tabtxt);font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 36px;border-radius:16px;box-shadow:0 4px 0 #e6d3b3}
-.done{position:absolute;right:0;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border-radius:12px;background:var(--blue-g);box-shadow:0 3px 0 var(--blue-sh);font-size:0;color:#fff;display:flex;align-items:center;justify-content:center}
-.done::after{content:"\2715";font-size:18px;font-weight:700}
-.done:active{transform:translateY(calc(-50% + 2px));box-shadow:0 1px 0 var(--blue-sh)}
+button.done{position:absolute;right:0;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border-radius:12px;background:var(--blue-g);box-shadow:0 3px 0 var(--blue-sh);font-size:0;color:#fff;display:flex;align-items:center;justify-content:center}
+button.done::after{content:"\2715";font-size:18px;font-weight:700}
+button.done:active{transform:translateY(calc(-50% + 2px));box-shadow:0 1px 0 var(--blue-sh)}
 .sheet-sub{text-align:center}
 .subhead{color:var(--tabtxt);font-size:15px}
 .hint{color:var(--text2)}
@@ -499,6 +499,12 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
 .badge.newb{background:var(--purple);box-shadow:0 2px 0 var(--purple-sh);font-size:10px;letter-spacing:.06em}
 #progList .row.lockd{opacity:.55}
 #progList .row{min-height:64px}
+/* shop on short phone screens (Safari with its toolbars): the card never gets clipped; the sheet scrolls if it must */
+#chars .sheet{overflow-y:auto;padding-bottom:calc(var(--bot) + 24px)}
+#chars .carousel{flex:0 0 auto!important;align-items:flex-start!important;padding-top:6px;padding-bottom:18px;overflow-y:visible}
+#chars .ccard .art{aspect-ratio:auto;height:clamp(150px,30vh,300px)}
+#chars .ccard .art img.charart{padding-top:4%}
+@media (max-height:700px){#chars .ccard .ds{display:none}#chars .sheet-head{margin-bottom:8px}}
 /* boot screen: shown until the illustrated art is ready, so the old placeholder figures never flash */
 .boot{background:var(--bg);align-items:center;justify-content:center;z-index:40;transition:opacity .35s}
 .boot.out{opacity:0;pointer-events:none}
@@ -585,7 +591,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
       </button>
     </div>
     <nav class="tabbar">
-      <button class="tab on" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round"><path d="M3.5 10.5L12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5z"/></svg><span data-i18n="home">Home</span></button>
+      <button class="tab on" aria-current="page" id="homeTab"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round"><path d="M3.5 10.5L12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5z"/></svg><span data-i18n="home">Home</span></button>
       <button class="tab" id="shopBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span data-i18n="shop">Shop</span></button>
       <button class="tab" id="progressBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span data-i18n="progress">Progress</span><i class="tabdot hidden" id="progDot"></i></button>
       <button class="tab" id="recordsBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M19 4v12"/><circle cx="17" cy="17.5" r="2.5"/></svg><span data-i18n="records">Records</span></button>
@@ -626,7 +632,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.7.0</p>
+      <p class="ver">Mumbai Local Straphanger 1.7.1</p>
     </div>
   </div>
 
@@ -3618,7 +3624,20 @@ function refreshMenus(){
   applyAudio();
 }
 let settingsFrom = 'start';
-function syncSheetOpen(){ document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet-wrap:not(.hidden)')); } // the floating sound button would cover the sheets' Done button
+const TAB_OF = { chars: 'shopBtn', progress: 'progressBtn', records: 'recordsBtn', settings: 'settingsBtn' };
+function syncSheetOpen(){
+  const open = [...document.querySelectorAll('.sheet-wrap:not(.hidden)')];
+  document.body.classList.toggle('sheet-open', !!open.length); // the floating sound button would cover the sheets' Done button
+  const top = open.length ? open[open.length - 1].id : '';      // highlight the tab for what's on screen
+  document.querySelectorAll('.tabbar .tab').forEach(t => t.classList.toggle('on', t.id === (TAB_OF[top] || 'homeTab')));
+  clearTimeout(syncSheetOpen.t); syncSheetOpen.t = setTimeout(ensureHome, 80);
+}
+// safety net: on the menu, if nothing at all is on screen, bring home back (no path can leave a blank, stuck screen)
+function ensureHome(){
+  if (S.state !== 'menu') return;
+  const anyUp = [...document.querySelectorAll('#start, .sheet-wrap, #over, #pause')].some(el => !el.classList.contains('hidden'));
+  if (!anyUp) { $('start').classList.remove('hidden'); refreshMenus(); }
+}
 function openPanel(id){ $(id).classList.remove('hidden'); syncSheetOpen(); }
 function closePanel(id){ $(id).classList.add('hidden'); syncSheetOpen(); }
 
@@ -3731,8 +3750,8 @@ on('recordsBtn', () => { renderRecords(); openPanel('records'); });
 $('abilBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); ensureAudio(); useAbility(); });
 on('passBtn', () => { ensureAudio(); sfxTap(); renderPass(); openPanel('pass'); });
 on('passClose', () => closePanel('pass'));
-on('progressBtn', () => { ensureAudio(); sfxTap(); renderProgress(); closePanel('start'); openPanel('progress'); });
-on('progressClose', () => { closePanel('progress'); openPanel('start'); refreshMenus(); });
+on('progressBtn', () => { ensureAudio(); sfxTap(); renderProgress(); openPanel('progress'); }); // home stays underneath, so every sheet opened from here closes back to it
+on('progressClose', () => { closePanel('progress'); refreshMenus(); });
 on('calClose', () => closePanel('cal')); on('calClaim', () => { ensureAudio(); claimCal(); });
 on('storyBtn', () => { ensureAudio(); sfxTap(); renderStory(); openPanel('story'); }); on('storyClose', () => closePanel('story'));
 on('rivalBtn', () => { ensureAudio(); sfxTap(); lbBoard = 'week'; renderRecords(); openPanel('records'); });
@@ -3820,7 +3839,9 @@ layout(); applyI18n(); applyA11y(); scheduleReminders(); tickLed();
 if (!SHOT) {
   if (unlocked('rival')) refreshRival();
   if (!save.tutorialDone && !readChallenge()) { const t0 = Date.now(); (function go(){ if (sprReady || artGaveUp || Date.now() - t0 > 9000) startGame(); else setTimeout(go, 60); })(); }
-  else if (save.cal.last !== dayKey() && unlocked('cal')) setTimeout(() => { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } }, 900);
+  else if (save.cal.last !== dayKey() && unlocked('cal')) { // open it under the loading screen, so it is there before the first tap (never pops over a tap)
+    const t0 = Date.now(); (function go(){ if (sprReady || artGaveUp || Date.now() - t0 > 9000) { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } } else setTimeout(go, 40); })();
+  }
 }
 function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
   save.tutorialDone = true;
@@ -3850,7 +3871,7 @@ function runShot(){ // deterministic states for store screenshots (waits for the
   if (SHOT === 'pass') { save.xp = 2350; save.passLv = passInfo(2350).L; renderPass(); openPanel('pass'); }
   if (SHOT === 'records') { save.name = 'Sijo'; save.records = [{ id: 1, d: 1240, lv: 4, c: 'desai', t: dayKey(), m: 'daily' }, { id: 2, d: 812, lv: 3, c: 'rahul', t: dayKey(), m: 'normal' }]; save.best = 1240; save.totals = { dist: 5320, runs: 14 }; save.daily.streak = 3; renderRecords(); openPanel('records'); }
   if (SHOT === 'play' || SHOT === 'over' || SHOT === 'event' || SHOT === 'chai') { S.autopilot = true; startGame(); S.dist = SHOT === 'play' ? 238 : 0; }
-  if (SHOT === 'over') setTimeout(() => { S.dist = 1240; S.level = 4; S.runCoins = 168; gameOver(); }, 400);
+  if (SHOT === 'over') setTimeout(() => { S.dist = 1240; S.level = 4; S.runCoins = 168; if (qp.get('mdone')) { const m = save.missions[0]; if (m) { m.done = true; S.doneThisRun.push(m); } } gameOver(); }, 400);
   if (SHOT === 'chars') { save.coins = 650; save.owned = ['rahul', 'desai']; S.previewChar = 'sunita'; $('charsBtn').click(); S.previewChar = 'sunita'; renderChars(); }
   if (SHOT === 'tut') { save.tutorialDone = false; hideOverlays(); startTutorial(); }
   if (SHOT === 'event' || SHOT === 'chai') { S.dist = 60; setTimeout(() => startEvent(1, SHOT === 'chai' ? 'chai' : (new URLSearchParams(location.search).get('ev') || 'monsoon')), 300); }
