@@ -632,7 +632,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
         <button class="setrow hidden" id="adPrivacyBtn" data-i18n="adPrivacy">Ad privacy choices</button>
       </div>
       <div class="group setlinks"><button class="setrow danger" id="resetBtn" data-i18n="reset">Reset progress</button></div>
-      <p class="ver">Mumbai Local Straphanger 1.7.1</p>
+      <p class="ver">Mumbai Local Straphanger · by Sijo Joseph</p>
     </div>
   </div>
 
@@ -3844,6 +3844,7 @@ if (!SHOT) {
   }
 }
 function runShot(){ // deterministic states for store screenshots (waits for the illustrated art)
+  document.querySelectorAll('.ver').forEach(v => v.style.display = 'none'); // no version numbers in screenshots
   save.tutorialDone = true;
   const sc = new URLSearchParams(location.search).get('c'); if (CHARS[sc]) { save.char = sc; save.owned = CHAR_ORDER.slice(); }
   const qp = new URLSearchParams(location.search), ln = qp.get('line'); if (LINES[ln]) { save.line = ln; save.passLv = 30; }

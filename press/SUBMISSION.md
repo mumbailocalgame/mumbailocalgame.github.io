@@ -1,6 +1,8 @@
 # Game Lab submission: Mumbai Local Straphanger
 
-## Fill in on the Game Lab website
+A self-initiated project for a game design challenge, by Sijo Joseph.
+
+## Fill in on the submission form
 
 | Field | Value |
 |---|---|
@@ -8,105 +10,53 @@
 | Team member email | sijojoseph7509@gmail.com |
 | Project title | **Mumbai Local Straphanger** |
 | Playable game | https://mumbailocalgame.github.io/ |
-| Documentation (PDF, 17 pages) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
+| Documentation (PDF, 24 pages) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-design-doc.pdf |
 | Video (trailer, 45 s) | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-trailer.mp4 |
-| Press kit (all of the above on one page) | https://mumbailocalgame.github.io/press/ |
 | Everything in one ZIP | https://mumbailocalgame.github.io/press/mumbai-local-straphanger-submission.zip |
+| Press page (all of the above) | https://mumbailocalgame.github.io/press/ |
 
-All links were checked again after the v1.4 update (11 Oct 2026) from a fresh browser with no sign-in: every one returns the file directly (HTTP 200), with no login or access request.
+Every link opens directly with no sign-in or access request.
 
-### Optional mirrors (if the judges prefer Google Drive / YouTube)
-The rules list Google Docs/Slides/Drive for documents and YouTube/Drive for videos as examples ("you may use…"). The links above already meet the requirement. To add mirrors:
-1. **PDF → Google Drive:** upload `mumbai-local-straphanger-design-doc.pdf`, then *Share → General access → Anyone with the link → Viewer*.
-2. **Video → YouTube:** upload `mumbai-local-straphanger-trailer.mp4` and set visibility to **Unlisted** or **Public** (not Private). It's vertical 1080×1920, so YouTube may show it as a Short; that's fine.
-3. Open both links in a private/incognito window before submitting.
+### Optional mirrors
+If the judges prefer Google Drive or YouTube: upload the PDF to Drive and set *General access → Anyone with the link → Viewer*; upload the trailer to YouTube as **Unlisted** or **Public**. Open both in a private window before submitting.
 
 ## One-line description
-A balance game for phones: it's peak hour on the Virar fast, and you hold one overhead strap while the train lurches from Churchgate to Virar. Touch the left or right half of the screen to lean.
+A balance game for phones: it's peak hour on a Mumbai local, and one overhead strap is all that keeps you on your feet. Hold the left or right half of the screen to lean.
 
-## Short description (≈100 words)
-Mumbai Local Straphanger is built around one moment every Mumbai commuter knows: the train jerks, your feet slide, and a single leather strap keeps you off a stranger's lap. Touch the left or right half of the screen to lean against the sway. At the edge, time slows and the crowd gasps; pull back and the game freezes for a beat while your neighbours cheer. That's a *clutch save*. At stations you lean toward a cutting chai, a newspaper or an empty seat. Send any ride to a friend on WhatsApp and race their ghost. Drawn in a Mario Miranda-inspired ink style, in English, Hindi and Marathi.
+## Short description (about 100 words)
+Mumbai Local Straphanger is built around one moment every Mumbai commuter knows: the train jerks, your feet slide, and a single strap keeps you off a stranger's lap. Hold the left or right half of the screen to lean against the sway. At the edge, time slows, your body glows red and the crowd gasps; pull back and the game freezes while your neighbours cheer. That's a *clutch save*. Lean toward a chai-wala or a newspaper at stations, race a friend's ghost on the same train, and climb weekly leaderboards. Drawn in a Mario Miranda-inspired ink style, and fully playable in English, Hindi and Marathi.
 
 ## How judges should play (on a phone)
-1. Open https://mumbailocalgame.github.io/ and tap the yellow ▶ button.
-2. A 10-second tutorial teaches the controls (or tap *Skip tutorial*).
-3. Hold the left half to lean left and the right half to lean right. Keep the needle in the green, watch for the yellow warning before each jerk, and recover from the red zone for a CLUTCH SAVE.
-On a computer: the ← → arrow keys (or A/D).
+1. Open https://mumbailocalgame.github.io/ in any phone browser.
+2. The game goes straight into a 10-second tutorial ride (or tap *Skip tutorial*).
+3. Press and **hold** the left half to lean left, the right half to lean right. Keep the needle in the green, watch for the arrows before each jerk, and pull back from the red for a clutch save.
+4. To see the other languages: Settings → Language (English → हिंदी → मराठी), live, without a restart.
 
-## Files in this folder
-- `mumbai-local-straphanger-design-doc.pdf`: 17-page game design document (v1.3) (source: `doc/design-doc.html`)
-- `mumbai-local-straphanger-trailer.mp4`: 45 s vertical trailer with soundtrack (built by `../tools/make_trailer.py`)
-- `press/`: the press-kit page published at /press/
+On a computer: the ← → arrow keys (or A/D), and E for the ability.
 
----
+## Highlights
+- **The core moment:** telegraphed jerks (a 0.6 s warning), slow motion and a heartbeat at the edge, a danger glow around the body, a freeze-frame clutch save, and a slow-motion replay you can share.
+- **Three languages:** 340 strings, each written in English, Hindi and Marathi, including station boards, announcements spoken by the phone's own voice, share cards and the daily story captions.
+- **Decisions in the world:** at stations a vendor's arm reaches in from each edge; lean toward the one you want.
+- **Four commuters, four abilities:** Second wind, Anchor, Iron grip and Quick hands, each upgradeable.
+- **Reasons to come back, introduced gently:** features open one at a time over the first rides: missions, abilities, a commuter pass, a weekly rival, story panels, postcards and stickers, a 7-day daily pass.
+- **Social:** seeded challenge links with a ghost, rematches, a personal-best ghost, weekly / longest-ride / total-distance leaderboards and private friend groups.
+- **Five real lines:** Western, Central, Harbour, Trans-Harbour and Metro Line 1, plus monsoon, festival and peak-hour events.
+- **Access:** colour-blind safe gauge, one-thumb mode, larger text, reduced motion, assist mode, and a friendly break nudge after 20 minutes.
 
-## What changed in v1.4 (latest): answering judge feedback
-| Feedback | What we built |
-|---|---|
-| "No hook for the user to come back" | **Commuter pass:** every metre is 1 XP, every clutch save +15, the Daily Ride +100. Every level pays coins; levels 3/5/7/10/15 unlock the Central and Harbour lines, Desai Uncle, Sunita Aunty and Ganesh. Ranks go from Ticketless to Motorman, with no top level. The game-over screen shows the XP bar filling and the next unlock. |
-| "Finish 3 routes and you're done" | Lines are now earned through the pass, stations loop with laps (rides never end), and pass levels keep going. |
-| Leaderboards | **Two global leaderboards:** longest single ride, and total distance over all rides. Pick a nickname, no account. Your rank is shown. |
-| "Scalability" | Leaderboard on Supabase (Postgres): players can read only names and scores, writes go through one function that only lets scores rise and rejects impossible values, indexed top-50 queries. The game itself is static files on a CDN, so there's no game server to scale. Lines, stations and events are data tables. |
-| "Controls (hold vs tap) unclear" | **Animated hand coach** in the tutorial: the hand presses and holds, and a ring fills only while the finger stays down. A quick tap shows "Don't tap. Hold it down!" The instructions now say "Press and HOLD". |
-| UI "looks AI-generated, not like a game" | **New casual-game UI**, rebuilt from a mobile-game reference: white and light-grey panels with tab headers, a saffron accent, chunky 3D buttons (orange = play, black = everything else), pill counters, a square ✕ to close, and character cards with a signature ability each. The live carriage is the home screen. |
-| "Make it easier to understand and click" | **Simpler home layout:** one full-width PLAY button under the route, labelled choices ("Line", "Where you stand"), locked lines show the level that opens them, and every tap target is at least 48 px tall. Checked on 360×640, 375×667, 390×844 and 430×932 screens. |
+## Files in the ZIP
+- `mumbai-local-straphanger-design-doc.pdf`: 24-page game design document
+- `mumbai-local-straphanger-trailer.mp4`: 45 s vertical trailer (1080×1920) with sound
+- `game/`: the complete playable game (serve the folder with any local web server, or play online)
+- `leaderboard-setup.sql`: the database setup for the online leaderboards
+- `SUBMISSION.md`: this sheet
 
-Bugs fixed: on opening the game, the old placeholder characters showed for a moment before the illustrated ones loaded. A loading screen now holds until the art is ready, and the placeholders are never drawn during loading. Also, in the tutorial, the forced 42° lean pushed the player's body and strap off the screen; the tutorial lean is now capped at 34°.
+## Testing
+Scripted touch tests on phone-browser screen sizes (360×640 to 430×932): first launch through the tutorial, play, pause, falling, game over, every tab and every Progress item, the shop on short screens, and a Hindi pass. No errors, no blank screens, nothing clipped.
 
-## What changed in v1.3.1
-- **Illustrated characters in the game:** the four commuters, the neighbours and the chaiwala are now drawn from the same Figma AI illustrations used in the shop, not simple canvas shapes.
-- **Natural movement:** the body bends at the hips (legs lean less than the upper body), the arm hinges at the shoulder, and the strap keeps a fixed length while its clamp slides along the rail with spring and damping. The strap goes slack when the hand rises. Feet take small steps, hop and stumble on jerks.
-- **Full-screen shop:** it opens edge to edge, so the character art is no longer cut off, with the card centred vertically.
-- **Accessories removed:** they didn't sit convincingly on the illustrated characters, so the Style tab, accessory purchases and streak accessory rewards are gone. Old saves that wore one are reset to none.
-
-### Bugs and glitches fixed in v1.3.1
-| Bug | Fix |
-|---|---|
-| Floating pieces of the strap ring appeared near the hand (the arm was cut out of the art with a rectangle, catching parts of the ring) | The arm is now traced from the ring down through connected pixels, keeping the head out |
-| Empty straps hung right beside the player | Removed when the illustrated characters are in use |
-| The game asked for 7 images that don't exist (404 errors on every load) | Build metadata removed from `sprites.json`, and the loader skips it |
-| In the full-screen shop, the floating sound button sat on top of **Done** | The sound button hides while any sheet is open |
-| The shop sheet was half height and cut off characters' heads | Full screen |
-| Seated pose rose instead of sitting down | Fixed |
-
-**QA (v1.3.1):** a scripted run through home, shop, records, a full ride to game over, a clutch save, a challenge link round-trip, and Marathi gameplay at 390×844. No page errors and no failed requests.
-
-## What changed in v1.3
-- **The save lands harder:** 0.12 s freeze-frame, relief face, neighbours cheer with speech bubbles ("Bach gaya!"), crowd gasp at the edge, relieved sigh, voice lines via the phone's own Hindi/Marathi/English voice.
-- **Best-save replay:** your best clutch save replays in slow motion on the game-over screen and can be shared as a video.
-- **Lean to choose:** at each station, chai / newspaper / headphones / a seat appear left and right; lean toward one to take it. Door vs middle standing position (door = ×1.5 coins, windier).
-- **Social:** "Challenge a friend" sends a WhatsApp link with the exact same seeded ride and a ghost of your lean. No server needed.
-- **Return reasons:** Central and Harbour lines, festival weeks (marigold torans, akash kandils, ×1.2 coins), Daily ride streaks.
-- **Art:** Mario Miranda-inspired ink style: outlines, hatching, caricature faces, a packed back row; commuters glare when you lean on them.
-- **Shop & UI:** full-screen shop with illustrated character cards and stat bars, springy motion, count-ups, confetti, ticking departure board, tap sounds.
-- **Tuning:** first-minute difficulty retuned from a novice-player simulation: the slowest quarter of first rides goes from 13 s to 19 s, and rides with a clutch save from 47% to about 65%. Easy mode added.
-- **Playtesting:** an on-device recorder (Records → Playtest data) with one-tap copy, for testing with real players.
-
-## What changed in this build
-
-**Core of the game: the clutch save.** Everything below supports one moment: teetering at the edge and pulling back.
-- **Telegraphed jerks:** 0.6 s before each jerk, a yellow edge glow, arrows and a rail-joint "tick" show which side the shove is coming from.
-- **Danger zone:** past 36°, time slows to 68%, the camera pushes in 4%, and a heartbeat speeds up as you near 45°.
-- **Clutch save + combo:** recovering from above 40° to under 25° is a save. Saves within 12 s chain (×2, ×3…), with coins × combo and a reward chord that rises a semitone each step. The game-over screen shows saves and your best combo.
-
-**Interface redesign.** Apple-style patterns (large titles, slide-up sheets, iOS switches, tab bar, island-style alerts) with music-app components (dark home screen, round play button, shelf of commuter "covers", ranked track list). Station-board yellow is the only accent, and the LED departure board is the recurring motif. Game over draws the Western line up to where you fell.
-
-**Fonts.** Google Sans (UI and in-game text, including Devanagari) and Google Sans Code (departure-board text), both SIL Open Font License, bundled in `www/fonts/` so the apps work offline.
-
-## Bugs fixed during QA
-| Bug | Fix |
-|---|---|
-| On real phones the home screen and the commuter shelf could not be scrolled by touch (the page-wide scroll guard blocked them) | The scroll guard now lets the home list, shelf and sheets scroll |
-| Swiping up while your finger was on the commuter shelf didn't scroll the page (the shelf only allowed sideways panning) | The shelf now passes vertical swipes to the page |
-| "Churchgate" label on the game-over route line was centred off the left edge | Pinned to the first station dot |
-| The gauge could crowd the LEAN labels on narrow phones | Gauge radius reduced on narrow screens |
-| The Pause button stayed visible while falling but did nothing | Hidden during the fall; it comes back on the next ride or a second chance |
-| Old pop-up text ("WHOA!") overlapped "ARRE BAAP RE!" when you fell | Pop-ups clear when you fall |
-| "BEST" in the in-game HUD stayed in English when playing in Hindi/Marathi | Translated |
-| Design doc: phones on page 8 ran into the footer, and the list on page 10 overflowed | Layout tightened; all 12 pages fit |
-| Trailer text came out extra-wide (wrong font axis), the first caption ran off the edge, and "VIRAR FAST"/"PF 3" overlapped | Correct font axes, captions auto-fit, spacing measured |
-| Tutorial step 1 could never finish (holding a side the whole time tipped you over) | Steps count time spent holding the correct side |
-
-**QA performed:** scripted taps and swipes on three phone sizes (375×667, 360×780, 430×932), covering home, scrolling, all four sheets, tutorial, play, pause/resume, falling, game over, "Ride again" and a full Hindi pass. No console errors, no elements overflowing the screen, and the game-over sheet fits on the smallest screen. Repeated against the live site.
-
-**Known limitations (honest notes):** difficulty is tuned with simulated players; real playtests with the built-in recorder are the next step. Voice lines depend on the phone having a Hindi/Marathi voice installed. The global leaderboard needs an online database switched on. The Hindi and Marathi text needs a native-speaker review. Online leaderboards aren't built yet. The web version has no ads; rewarded ads exist only in the (unreleased) app builds, using Google test IDs.
+## Honest notes
+- Difficulty was tuned with a simulated novice player; playtests with real commuters are the next step.
+- The Hindi and Marathi text was written with machine help; a review sheet is ready for native speakers.
+- Online leaderboards need the Supabase database switched on; until then the boards show a clearly marked preview.
+- Voice lines depend on the phone having a Hindi or Marathi voice installed.
+- Illustrations were generated with Figma AI and cut into a moving rig by the project's own script.
