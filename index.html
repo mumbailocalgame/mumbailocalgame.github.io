@@ -751,7 +751,6 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
 
 <script src="i18n.js"></script>
 <script src="lb-config.js"></script>
-<script src="art/sprites.js"></script>
 <script>
 (() => {
 'use strict';
@@ -2855,7 +2854,7 @@ function drawReplayHud(){
    figure around the feet for the lean, and draws the strap live from the rail to the ring in the hand. */
 const SPR = {};
 let sprReady = false;
-(window.MLS_SPRITES ? Promise.resolve(window.MLS_SPRITES) : fetch('art/sprites.json').then(r => r.json())).then(m => {
+fetch('art/sprites.json').then(r => r.json()).then(m => {
   const ents = Object.entries(m).filter(([k]) => k[0] !== '_'); // '_' keys are build metadata, not images
   let left = ents.length; const total = left;
   for (const [k, v] of ents) {
