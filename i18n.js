@@ -3,6 +3,7 @@
 // have a native speaker review them before release.
 window.MLS_I18N = {
   en: {
+    ghostTag: "ghost",
     pointsHit: "THADAK!",
     points: "POINTS",
     unlockAfter: "Unlocks after {0} rides",
@@ -276,6 +277,7 @@ window.MLS_I18N = {
   },
 
   hi: {
+    ghostTag: "घोस्ट",
     pointsHit: "धड़ाक!",
     points: "पॉइंट्स",
     unlockAfter: "{0} राइड के बाद खुलेगा",
@@ -549,6 +551,7 @@ window.MLS_I18N = {
   },
 
   mr: {
+    ghostTag: "घोस्ट",
     pointsHit: "धडाक!",
     points: "पॉइंट्स",
     unlockAfter: "{0} राइडनंतर उघडेल",

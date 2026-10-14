@@ -751,6 +751,7 @@ body.reduce *,body.reduce *::before,body.reduce *::after{animation:none!importan
 
 <script src="i18n.js"></script>
 <script src="lb-config.js"></script>
+<script src="art/sprites.js"></script>
 <script>
 (() => {
 'use strict';
@@ -1454,7 +1455,7 @@ function startGame(mode){
   // every ride is seeded, so any ride can be sent to a friend as a challenge
   S.seed = mode === 'daily' ? strHash('mls-ride-' + dayKey()) : mode === 'challenge' ? (S.challenge.s >>> 0) : (Math.random() * 4294967296) >>> 0;
   S.line = mode === 'daily' ? 'western' : mode === 'challenge' ? (LINES[S.challenge.l] ? S.challenge.l : 'western') : save.line;
-  S.ghost = mode === 'challenge' ? S.challenge : (mode === 'normal' && save.pbTrace && save.pbD > 60 ? { d: save.pbD, trace: traceDec(save.pbTrace), pb: true } : null); // race your own best
+  S.ghost = mode === 'challenge' ? S.challenge : (mode === 'normal' && save.pbD > 60 ? { d: save.pbD, pb: true } : null); // only for the 'you passed it' moment; nothing is drawn
   gRng = mulberry(S.seed);
   ensureAudio(); clearInput(); reset(); hideOverlays();
   S.runId = Date.now();
@@ -1549,7 +1550,10 @@ function jerk(dir, mag, fx, quiet){
 /* ---------- Passers-by: people boarding at stations and crossing the aisle (Figma AI walk cycles) ---------- */
 const WALK = { office: ['office-w1', 'office-w2', 'office-w3', 'office-w2'], girl: ['girl-w1', 'girl-w2', 'girl-w3', 'girl-w2'],
   grandpa: ['grandpa-w1', 'grandpa-w2', 'grandpa-w3', 'grandpa-w2'], kid: ['kid-r1', 'kid-r2', 'kid-r3', 'kid-r2'] };
-const WALK_H = { office: 1, girl: 0.94, grandpa: 0.86, kid: 0.62 }, WALK_FPS = { office: 7, girl: 7.5, grandpa: 3.6, kid: 12 };
+// heights relative to a standing adult: Dadaji stoops a little, the schoolkid is about ten
+const WALK_H = { office: 1, girl: 0.95, grandpa: 0.94, kid: 0.68 }, WALK_FPS = { office: 7, girl: 7.5, grandpa: 3.6, kid: 12 };
+// a standing adult's head-to-feet height on screen (measured from the illustrated commuters: ~80% of the strap-to-feet figure)
+const adultH = () => (G.floorY - (G.railY + G.L * 0.32)) * 0.8;
 function spawnWalker(kind, dir, speed, delay){ (S.walkers || (S.walkers = [])).push({ kind, dir, x: dir > 0 ? -0.25 : 1.25, v: speed, t: -(delay || 0) }); }
 function updateWalkers(dt){
   if (!S.walkers) return;
@@ -1558,11 +1562,11 @@ function updateWalkers(dt){
 }
 function drawWalkers(){
   if (!S.walkers || !S.walkers.length || !sprReady) return;
-  const base = G.floorY - G.winY1 * 0.95, by = G.floorY - H * 0.012;
+  const by = G.floorY - H * 0.012;
   for (const w of S.walkers) {
     if (w.t < 0) continue;
     const sp = SPR[WALK[w.kind][Math.floor(w.t * WALK_FPS[w.kind]) % 4]]; if (!sp || !artOk(sp.img)) continue;
-    const sc = base * WALK_H[w.kind] * 0.9 / sp.h, bob = Math.abs(Math.sin(w.t * WALK_FPS[w.kind] * Math.PI / 2)) * (w.kind === 'kid' ? 5 : 1.6);
+    const sc = adultH() * WALK_H[w.kind] / (sp.foot[1] - sp.top[1]), bob = Math.abs(Math.sin(w.t * WALK_FPS[w.kind] * Math.PI / 2)) * (w.kind === 'kid' ? 5 : 1.6);
     ctx.save(); ctx.translate(w.x * W, by - bob); ctx.scale(w.dir, 1);
     ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(0, bob, sp.w * sc * 0.32, 5, 0, 0, TAU); ctx.fill();
     ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc); ctx.restore();
@@ -2686,19 +2690,6 @@ function drawPlayer(forceKey, accOverride){
   inkLimb(sx, sy, elx, ely, hx, hy, tw * 0.24, tw * 0.18, sleeve, skin);
   ctx.beginPath(); ctx.arc(hx, hy, tw * 0.12, 0, TAU); fillInk(skin, 0.9);
 }
-function drawGhost(){
-  if (!S.ghost || S.state !== 'playing' || S.dist > S.ghost.d) return;
-  const tr = S.ghost.trace, tl = tr.length ? tr[Math.min(tr.length - 1, Math.floor(S.dist / 4))] : 0;
-  const th = tl * DEG, fx = G.cx - G.tw * 0.75, fy = G.floorY, leg = G.legLen, tor = G.torsoLen, tw = G.tw, hr = G.headR;
-  ctx.save(); ctx.globalAlpha = 0.32; ctx.translate(fx, fy); ctx.rotate(th);
-  ctx.strokeStyle = '#64d2ff'; ctx.fillStyle = 'rgba(100,210,255,.25)'; ctx.lineWidth = 3;
-  ctx.beginPath(); rr(ctx, -tw * 0.42, -leg - tor, tw * 0.84, tor + 8, tw * 0.3); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(-tw * 0.18, -leg); ctx.lineTo(-tw * 0.26, 0); ctx.moveTo(tw * 0.18, -leg); ctx.lineTo(tw * 0.26, 0); ctx.stroke();
-  ctx.beginPath(); ctx.arc(0, -leg - tor - hr, hr * 0.9, 0, TAU); ctx.fill(); ctx.stroke();
-  ctx.globalAlpha = 0.8; ctx.fillStyle = '#64d2ff'; ctx.font = `700 ${Math.round(8 * G.u + 6)}px ${FONT}`; ctx.textAlign = 'center';
-  ctx.fillText(S.ghost.pb ? T('pbGhost') : (S.ghost.n || T('aFriend')), 0, -leg - tor - hr * 2.4);
-  ctx.restore();
-}
 function drawForeground(){
   const sw = clamp(S.force * 0.06, -12, 12) * G.u;
   // two nearby commuters' heads in silhouette, inked
@@ -2854,7 +2845,7 @@ function drawReplayHud(){
    figure around the feet for the lean, and draws the strap live from the rail to the ring in the hand. */
 const SPR = {};
 let sprReady = false;
-fetch('art/sprites.json').then(r => r.json()).then(m => {
+(window.MLS_SPRITES ? Promise.resolve(window.MLS_SPRITES) : fetch('art/sprites.json').then(r => r.json())).then(m => {
   const ents = Object.entries(m).filter(([k]) => k[0] !== '_'); // '_' keys are build metadata, not images
   let left = ents.length; const total = left;
   for (const [k, v] of ents) {
@@ -3043,7 +3034,7 @@ function drawChaiwalaSprite(){
   if (!sprReady || !sprOk('chai-walk1')) return false;
   const p = S.eventT / S.eventDur, x = S.evSide > 0 ? lerp(-W * 0.25, W * 1.25, p) : lerp(W * 1.25, -W * 0.25, p);
   const frames = ['chai-walk1', 'chai-walk2', 'chai-walk3', 'chai-walk2'], sp = SPR[frames[Math.floor(S.t * 7) % 4]];
-  const sc = (G.floorY - G.winY1 * 0.95) / sp.h, by = G.floorY - H * 0.005, flip = S.evSide > 0 ? 1 : -1;
+  const sc = adultH() / (sp.foot[1] - sp.top[1]), by = G.floorY - H * 0.012, flip = S.evSide > 0 ? 1 : -1;
   ctx.save(); ctx.translate(x, by - Math.abs(Math.sin(S.t * 14)) * 2); ctx.scale(flip, 1);
   ctx.drawImage(sp.img, -sp.foot[0] * sc, -sp.foot[1] * sc, sp.w * sc, sp.h * sc);
   ctx.restore();
@@ -3262,7 +3253,7 @@ function render(){
   const z = save.settings.reduceMotion ? 1 : 1 + 0.04 * S.danger; // push in on the player at the edge
   ctx.save();
   ctx.translate(W / 2 + ox, H * 0.55 + oy); ctx.rotate(roll); ctx.scale(z, z); ctx.translate(-W / 2, -H * 0.55);
-  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); const aw = artWait(); if (!drawCommuterSprites() && !aw) drawCommuters(); if (!drawChaiwalaSprite() && !aw) drawChaiwala(); drawWalkers(); drawGhost(); if (!drawPlayerSprite() && !aw) drawPlayer(); drawForeground(); drawBubbles();
+  drawInterior(); drawBgStraps(); drawBackRow(); drawPoles(); const aw = artWait(); if (!drawCommuterSprites() && !aw) drawCommuters(); if (!drawChaiwalaSprite() && !aw) drawChaiwala(); drawWalkers(); if (!drawPlayerSprite() && !aw) drawPlayer(); drawForeground(); drawBubbles();
   if (S.event === 'tunnel') { ctx.fillStyle = `rgba(10,5,25,${0.4 * evK()})`; ctx.fillRect(-80, -80, W + 160, H + 160); }
   ctx.restore();
   drawFx(); drawOffer(); drawBuffs(); drawBoard(); drawBanner(); drawTutorial(); if (S.state !== 'replay') { drawGauge(); drawTouchHints(); } drawReplayHud();
@@ -3839,7 +3830,7 @@ layout(); applyI18n(); applyA11y(); scheduleReminders(); tickLed();
 if (!SHOT) {
   if (unlocked('rival')) refreshRival();
   if (!save.tutorialDone && !readChallenge()) { const t0 = Date.now(); (function go(){ if (sprReady || artGaveUp || Date.now() - t0 > 9000) startGame(); else setTimeout(go, 60); })(); }
-  else if (save.cal.last !== dayKey() && unlocked('cal')) { // open it under the loading screen, so it is there before the first tap (never pops over a tap)
+  else if (save.cal.last !== dayKey() && unlocked('cal') && !readChallenge()) { // a friend's challenge link opens straight to the challenge // open it under the loading screen, so it is there before the first tap (never pops over a tap)
     const t0 = Date.now(); (function go(){ if (sprReady || artGaveUp || Date.now() - t0 > 9000) { if (S.state === 'menu' && !anyPanelOpen()) { renderCal(); openPanel('cal'); } } else setTimeout(go, 40); })();
   }
 }
