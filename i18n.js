@@ -3,6 +3,9 @@
 // have a native speaker review them before release.
 window.MLS_I18N = {
   en: {
+    rotateS: "Mumbai Local is played holding the phone upright.",
+    rotateT: "Turn your phone upright",
+    missionsAllDone: "All done today. New missions tomorrow!",
     ghostTag: "ghost",
     pointsHit: "THADAK!",
     points: "POINTS",
@@ -277,6 +280,9 @@ window.MLS_I18N = {
   },
 
   hi: {
+    rotateS: "मुंबई लोकल फ़ोन सीधा पकड़कर खेला जाता है।",
+    rotateT: "फ़ोन को सीधा पकड़ें",
+    missionsAllDone: "आज के सब पूरे। कल नए मिशन!",
     ghostTag: "घोस्ट",
     pointsHit: "धड़ाक!",
     points: "पॉइंट्स",
@@ -551,6 +557,9 @@ window.MLS_I18N = {
   },
 
   mr: {
+    rotateS: "मुंबई लोकल फोन सरळ धरून खेळला जातो.",
+    rotateT: "फोन सरळ धरा",
+    missionsAllDone: "आजचे सगळे पूर्ण. उद्या नवे मिशन!",
     ghostTag: "घोस्ट",
     pointsHit: "धडाक!",
     points: "पॉइंट्स",
